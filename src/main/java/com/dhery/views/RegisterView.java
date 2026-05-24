@@ -59,72 +59,106 @@ public class RegisterView {
         description.setTextAlignment(TextAlignment.CENTER);
 
         // =====================================================
-        // NOMBRE
-        // =====================================================
-        Label nameLabel = new Label("Nombre completo");
+// NOMBRES
+// =====================================================
+Label namesLabel = new Label("Nombres");
 
-        nameLabel.setTextFill(Color.web("#4A403A"));
+namesLabel.setTextFill(Color.web("#4A403A"));
 
-        nameLabel.setFont(
-                Font.font("Arial", FontWeight.BOLD, 15)
-        );
+namesLabel.setFont(
+        Font.font("Arial", FontWeight.BOLD, 15)
+);
 
-        TextField nameField = new TextField();
+TextField namesField = new TextField();
 
-        nameField.setPromptText("Ingrese su nombre");
+namesField.setPromptText("Ingrese sus nombres");
 
-        styleField(nameField);
+styleField(namesField);
 
-        // =====================================================
-        // USUARIO
-        // =====================================================
-        Label userLabel = new Label("Nombre de usuario");
+// =====================================================
+// APELLIDOS
+// =====================================================
+Label lastNameLabel = new Label("Apellidos");
 
-        userLabel.setTextFill(Color.web("#4A403A"));
+lastNameLabel.setTextFill(Color.web("#4A403A"));
 
-        userLabel.setFont(
-                Font.font("Arial", FontWeight.BOLD, 15)
-        );
+lastNameLabel.setFont(
+        Font.font("Arial", FontWeight.BOLD, 15)
+);
 
-        TextField usernameField = new TextField();
+TextField lastNameField = new TextField();
 
-        usernameField.setPromptText("Ingrese un usuario");
+lastNameField.setPromptText("Ingrese sus apellidos");
 
-        styleField(usernameField);
+styleField(lastNameField);
 
-        // =====================================================
-        // PASSWORD
-        // =====================================================
-        Label passLabel = new Label("Contraseña");
+// =====================================================
+// TELÉFONO
+// =====================================================
+Label phoneLabel = new Label("Teléfono");
 
-        passLabel.setTextFill(Color.web("#4A403A"));
+phoneLabel.setTextFill(Color.web("#4A403A"));
 
-        passLabel.setFont(
-                Font.font("Arial", FontWeight.BOLD, 15)
-        );
+phoneLabel.setFont(
+        Font.font("Arial", FontWeight.BOLD, 15)
+);
 
-        PasswordField passwordField = new PasswordField();
+TextField phoneField = new TextField();
 
-        passwordField.setPromptText("Ingrese una contraseña");
+phoneField.setPromptText("Ingrese su teléfono");
 
-        styleField(passwordField);
+styleField(phoneField);
 
-        // =====================================================
-        // CONFIRM PASSWORD
-        // =====================================================
-        Label confirmLabel = new Label("Confirmar contraseña");
+// =====================================================
+// DIRECCIÓN
+// =====================================================
+Label addressLabel = new Label("Dirección");
 
-        confirmLabel.setTextFill(Color.web("#4A403A"));
+addressLabel.setTextFill(Color.web("#4A403A"));
 
-        confirmLabel.setFont(
-                Font.font("Arial", FontWeight.BOLD, 15)
-        );
+addressLabel.setFont(
+        Font.font("Arial", FontWeight.BOLD, 15)
+);
 
-        PasswordField confirmField = new PasswordField();
+TextField addressField = new TextField();
 
-        confirmField.setPromptText("Repita la contraseña");
+addressField.setPromptText("Ingrese su dirección");
 
-        styleField(confirmField);
+styleField(addressField);
+
+// =====================================================
+// CONTRASEÑA
+// =====================================================
+Label passLabel = new Label("Contraseña");
+
+passLabel.setTextFill(Color.web("#4A403A"));
+
+passLabel.setFont(
+        Font.font("Arial", FontWeight.BOLD, 15)
+);
+
+PasswordField passwordField = new PasswordField();
+
+passwordField.setPromptText("Ingrese una contraseña");
+
+styleField(passwordField);
+
+// =====================================================
+// CONFIRMAR CONTRASEÑA
+// =====================================================
+Label confirmLabel = new Label("Confirmar contraseña");
+
+confirmLabel.setTextFill(Color.web("#4A403A"));
+
+confirmLabel.setFont(
+        Font.font("Arial", FontWeight.BOLD, 15)
+);
+
+PasswordField confirmField = new PasswordField();
+
+confirmField.setPromptText("Repita la contraseña");
+
+styleField(confirmField);
 
         // =====================================================
         // BOTÓN REGISTRO
@@ -349,19 +383,30 @@ public class RegisterView {
         // FORM
         // =====================================================
         VBox form = new VBox(
-                14,
-                nameLabel,
-                nameField,
-                userLabel,
-                usernameField,
-                passLabel,
-                passwordField,
-                confirmLabel,
-                confirmField,
-                registerBtn,
-                loginBox,
-                backBtn
-        );
+        12,
+
+        namesLabel,
+        namesField,
+
+        lastNameLabel,
+        lastNameField,
+
+        phoneLabel,
+        phoneField,
+
+        addressLabel,
+        addressField,
+
+        passLabel,
+        passwordField,
+
+        confirmLabel,
+        confirmField,
+
+        registerBtn,
+        loginBox,
+        backBtn
+);
 
         form.setAlignment(Pos.CENTER);
 
@@ -377,9 +422,9 @@ public class RegisterView {
 
         card.setAlignment(Pos.CENTER);
 
-        card.setPadding(new Insets(60));
+        card.setPadding(new Insets(50));
 
-        card.setMaxWidth(700);
+        card.setMaxWidth(750);
 
         card.setStyle("""
             -fx-background-color: white;

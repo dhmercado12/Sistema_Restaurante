@@ -249,9 +249,9 @@ title.setTextAlignment(TextAlignment.CENTER);
         registerText.setFont(Font.font("Arial", 15));
 
         Hyperlink registerLink = new Hyperlink("Regístrate");
-
+               
         registerLink.setTextFill(Color.web("#4A90E2"));
-
+         
         registerLink.setFont(
                 Font.font("Arial", FontWeight.BOLD, 15)
         );
@@ -267,6 +267,10 @@ title.setTextAlignment(TextAlignment.CENTER);
         registerLink.setOnMouseExited(e -> {
             registerLink.setTextFill(Color.web("#4A90E2"));
         });
+
+        registerLink.setOnAction(e -> {
+             Router.goRegisterView();
+           });
 
         HBox registerBox = new HBox(
                 5,

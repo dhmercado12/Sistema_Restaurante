@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 import com.dhery.views.LoginView;
 import com.dhery.views.ClientLoginView;
 import com.dhery.views.CashierLoginView;
+import com.dhery.views.RegisterView;
 
 public class Router {
 
@@ -40,6 +41,11 @@ public static void goCashierLoginView() {
     stage.setTitle("Tacabrón - Cajero");
 }
 
+public static void goRegisterView() {
 
+    stage.setScene(RegisterView.getScene());
+
+    stage.setTitle("Tacabrón - Registro");
+}
 
 }
