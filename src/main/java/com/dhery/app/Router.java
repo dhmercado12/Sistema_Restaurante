@@ -6,6 +6,10 @@ import com.dhery.views.LoginView;
 import com.dhery.views.ClientLoginView;
 import com.dhery.views.CashierLoginView;
 import com.dhery.views.RegisterView;
+import com.dhery.views.MenuCajeroView;
+import com.dhery.views.TakeOrderView;
+import com.dhery.views.StockView;
+
 
 public class Router {
 
@@ -27,7 +31,7 @@ public class Router {
     stage.setTitle("Tacabrón - Login");
 }
 
- public static void goClientLogin() {
+public static void goClientLogin() {
 
     stage.setScene(ClientLoginView.getScene());
 
@@ -42,10 +46,27 @@ public static void goCashierLoginView() {
 }
 
 public static void goRegisterView() {
-
-    stage.setScene(RegisterView.getScene());
-
-    stage.setTitle("Tacabrón - Registro");
+        stage.setScene(RegisterView.getScene());
+        stage.setTitle("Tacabrón - Registro");
+    }
+    
+public static void goMenuCajeroView() {
+    stage.setScene(MenuCajeroView.getScene());
+    stage.setTitle("Tacabrón - Menú Cajero");
 }
 
+public static void goTakeOrderView() {
+    stage.setScene(TakeOrderView.getScene());
+    stage.setTitle("Tacabrón - Tomar Pedido");
+}
+
+public static void goStockView() {
+    stage.setScene(StockView.getScene());
+    stage.setTitle("Tacabrón - Stock");
+}
+
+public static void goOrderStatusView() {
+        stage.setScene(MenuCajeroView.getScene());
+        stage.setTitle("Tacabrón - Estado de Pedido");
+    }
 }

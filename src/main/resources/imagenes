@@ -1,0 +1,1 @@
+Image img = new Image(getClass().getResourceAsStream("/images/nombreImagen.png"));

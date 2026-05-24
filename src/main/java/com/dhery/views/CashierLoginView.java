@@ -237,6 +237,9 @@ public class CashierLoginView {
             """);
         });
 
+        // ACCIÓN DEL BOTÓN LOGIN PARA CAJERO
+        loginBtn.setOnAction(e -> Router.goMenuCajeroView());
+
         // =====================================================
         // TEXTO ADMIN
         // =====================================================
