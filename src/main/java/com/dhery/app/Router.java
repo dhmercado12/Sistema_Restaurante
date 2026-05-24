@@ -40,4 +40,6 @@ public static void goCashierLoginView() {
     stage.setTitle("Tacabrón - Cajero");
 }
 
+
+
 }

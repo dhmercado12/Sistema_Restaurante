@@ -503,43 +503,5 @@ public class StartView {
         return card;
     }
 
-    // =====================================================
-    // INFO CARD
-    // =====================================================
-    private static VBox infoCard(
-            String title,
-            String desc
-    ) {
-
-        Label titleLabel = new Label(title);
-
-        titleLabel.setTextFill(Color.WHITE);
-
-        titleLabel.setFont(
-                Font.font("Arial", FontWeight.BOLD, 20)
-        );
-
-        Label descLabel = new Label(desc);
-
-        descLabel.setWrapText(true);
-
-        descLabel.setTextFill(Color.web("#B8B8C7"));
-
-        VBox card = new VBox(
-                12,
-                titleLabel,
-                descLabel
-        );
-
-        card.setPadding(new Insets(25));
-
-        card.setStyle("""
-            -fx-background-color: rgba(255,255,255,0.04);
-            -fx-background-radius: 20;
-            -fx-border-radius: 20;
-            -fx-border-color: rgba(255,255,255,0.05);
-        """);
-
-        return card;
-    }
+    
 }
