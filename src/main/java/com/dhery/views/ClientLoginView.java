@@ -182,6 +182,10 @@ title.setTextAlignment(TextAlignment.CENTER);
                 5
             );
         """);
+          // ACCIÓN DEL BOTÓN LOGIN PARA CAJERO
+        loginBtn.setOnAction(e -> Router.goMenuClienteView());
+
+
 
         // HOVER
         loginBtn.setOnMouseEntered(e -> {
@@ -238,6 +242,7 @@ title.setTextAlignment(TextAlignment.CENTER);
                 );
             """);
         });
+
 
         // =====================================================
         // REGISTRO

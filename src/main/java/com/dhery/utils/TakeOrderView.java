@@ -1,4 +1,4 @@
-package com.dhery.views;
+package com.dhery.utils;
 
 import com.dhery.app.Router;
 import javafx.beans.property.*;

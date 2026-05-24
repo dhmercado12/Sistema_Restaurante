@@ -1,4 +1,4 @@
-package com.dhery.db;
+package com.dhery.GestorArchivo;
 
 public class clase {
     

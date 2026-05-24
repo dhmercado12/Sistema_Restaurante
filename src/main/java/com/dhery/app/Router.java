@@ -4,14 +4,31 @@ import com.dhery.views.StartView;
 import javafx.stage.Stage;
 import com.dhery.views.LoginView;
 import com.dhery.views.ClientLoginView;
+import com.dhery.utils.TakeOrderView;
 import com.dhery.views.CashierLoginView;
 import com.dhery.views.RegisterView;
 import com.dhery.views.MenuCajeroView;
-import com.dhery.views.TakeOrderView;
+import com.dhery.views.MenuClienteView;
 import com.dhery.views.StockView;
+import com.dhery.views.SuggestionView;
 
 
 public class Router {
+
+    public enum Role {
+        CAJERO,
+        CLIENTE
+    }
+
+    private static Role currentRole;
+
+    public static void setRole(Role role) {
+        currentRole = role;
+    }
+
+    public static Role getRole() {
+        return currentRole;
+    }
 
     private static Stage stage;
 
@@ -68,5 +85,15 @@ public static void goStockView() {
 public static void goOrderStatusView() {
         stage.setScene(MenuCajeroView.getScene());
         stage.setTitle("Tacabrón - Estado de Pedido");
+    }
+
+    public static void goMenuClienteView() {
+        stage.setScene(MenuClienteView.getScene());
+        stage.setTitle("Tacabrón - Menú Cliente");
+    }
+
+    public static void goSuggestionView() {
+        stage.setScene(SuggestionView.getScene());
+        stage.setTitle("Tacabrón - Sugerencias");
     }
 }
