@@ -244,41 +244,51 @@ public class StartView {
         // SOLUCIÓN DEL SISTEMA
         // =====================================================
         Label solutionTitle = new Label(
-                "Nuestra solución tecnológica"
-        );
+        "¿Cómo utilizar nuestro sistema?"
+);
 
-        solutionTitle.setTextFill(Color.WHITE);
+solutionTitle.setTextFill(Color.WHITE);
 
-        solutionTitle.setFont(
-                Font.font("Arial", FontWeight.BOLD, 38)
-        );
+solutionTitle.setFont(
+        Font.font("Arial", FontWeight.BOLD, 38)
+);
 
-        Label solutionText = new Label("""
-                El sistema desarrollado para Tacabrón centraliza toda
-                la información del negocio en una única plataforma.
+Label solutionText = new Label("""
+         Bienvenido al sistema de gestión de Tacabrón.
 
-                La aplicación permite gestionar ventas, pedidos,
-                inventario, productos, delivery y reportes financieros
-                de forma organizada, moderna y eficiente.
+         Este software fue diseñado para facilitar el trabajo diario,del restaurante mediante una interfaz moderna, rápida e intuitiva.Desde el menú principal podrás acceder a diferentes módulos según tus necesidades:
 
-                Gracias al uso de una arquitectura MVC y herramientas
-                modernas de desarrollo, el sistema garantiza una
-                estructura escalable, mantenible y fácil de utilizar.
-                """);
+                                   • Realizar pedidos de manera rápida y organizada.
+                                   • Consultar el menú actualizado con precios y promociones.
+                                   • Gestionar productos e inventario del restaurante.
+                                   • Revisar pedidos registrados y su estado actual.
+                                   • Visualizar reportes y estadísticas del negocio.
+                                   • Administrar información de clientes y delivery.
 
-        solutionText.setTextFill(Color.web("#B8B8C7"));
-        solutionText.setFont(Font.font(18));
-        solutionText.setWrapText(true);
-        solutionText.setMaxWidth(900);
+         El sistema cuenta con navegación sencilla mediante botones, vistas organizadas y herramientas visuales que permiten utilizar la aplicación sin necesidad de conocimientos técnicos.
 
-        VBox solutionSection = new VBox(
-                30,
-                solutionTitle,
-                solutionText
-        );
+         Nuestro objetivo es optimizar la atención al cliente, mejorar el control del negocio y brindar una experiencia tecnológica moderna dentro del restaurante.
+         """);
 
-        solutionSection.setAlignment(Pos.CENTER);
-        solutionSection.setPadding(new Insets(70));
+solutionText.setTextFill(Color.web("#B8B8C7"));
+
+solutionText.setFont(Font.font(18));
+
+solutionText.setWrapText(true);
+
+solutionText.setMaxWidth(900);
+
+solutionText.setLineSpacing(4);
+
+VBox solutionSection = new VBox(
+        30,
+        solutionTitle,
+        solutionText
+);
+
+solutionSection.setAlignment(Pos.CENTER);
+
+solutionSection.setPadding(new Insets(70));
 
         // =====================================================
         // BENEFICIOS

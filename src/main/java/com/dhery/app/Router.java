@@ -5,12 +5,14 @@ import javafx.stage.Stage;
 import com.dhery.views.LoginView;
 import com.dhery.views.ClientLoginView;
 import com.dhery.utils.TakeOrderView;
+import com.dhery.views.TakeOrderViewC;
 import com.dhery.views.CashierLoginView;
 import com.dhery.views.RegisterView;
 import com.dhery.views.MenuCajeroView;
 import com.dhery.views.MenuClienteView;
 import com.dhery.views.StockView;
 import com.dhery.views.SuggestionView;
+import com.dhery.views.MostrarMenu;
 
 
 public class Router {
@@ -77,6 +79,11 @@ public static void goTakeOrderView() {
     stage.setTitle("Tacabrón - Tomar Pedido");
 }
 
+public static void goTakeOrderViewC() {
+    stage.setScene(TakeOrderViewC.getScene());
+    stage.setTitle("Tacabrón - realizar Pedido");
+}
+
 public static void goStockView() {
     stage.setScene(StockView.getScene());
     stage.setTitle("Tacabrón - Stock");
@@ -96,4 +103,10 @@ public static void goOrderStatusView() {
         stage.setScene(SuggestionView.getScene());
         stage.setTitle("Tacabrón - Sugerencias");
     }
+
+    public static void goMostrarMenu() {
+        stage.setScene(MostrarMenu.getScene());
+        stage.setTitle("Tacabrón - Menú");
+    }
+
 }

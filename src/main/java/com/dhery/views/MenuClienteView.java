@@ -214,10 +214,10 @@ public class MenuClienteView {
         // ── ACCIONES ─────────────────────────────────────────
 
         if (title.equals("REALIZAR PEDIDO")) {
-            card.setOnMouseClicked(e -> Router.goTakeOrderView());
+            card.setOnMouseClicked(e -> Router.goTakeOrderViewC());
 
         } else if (title.equals("VER MENÚ")) {
-          //  card.setOnMouseClicked(e -> Router.goTakeOrderView());
+           card.setOnMouseClicked(e -> Router.goMostrarMenu());
 
         } else if (title.equals("VER MIS PEDIDOS")) {
             //card.setOnMouseClicked(e -> Router.goMyOrdersView());
