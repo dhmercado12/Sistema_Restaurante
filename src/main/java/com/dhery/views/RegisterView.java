@@ -1,6 +1,8 @@
 package com.dhery.views;
 
 import com.dhery.app.Router;
+import com.dhery.models.user;
+import com.dhery.repositories.UserRepository;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -258,6 +260,84 @@ styleField(confirmField);
                 );
             """);
         });
+        registerBtn.setOnAction(e -> {
+
+    String nombre = namesField.getText().trim();
+    String apellido = lastNameField.getText().trim();
+    String telefono = phoneField.getText().trim();
+    String direccion = addressField.getText().trim();
+
+    String password = passwordField.getText();
+    String confirmar = confirmField.getText();
+
+    if (nombre.isEmpty()
+            || apellido.isEmpty()
+            || telefono.isEmpty()
+            || direccion.isEmpty()
+            || password.isEmpty()
+            || confirmar.isEmpty()) {
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText(null);
+        alert.setContentText("Complete todos los campos");
+        alert.showAndWait();
+
+        return;
+    }
+
+    if (!password.equals(confirmar)) {
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText(null);
+        alert.setContentText("Las contraseñas no coinciden");
+        alert.showAndWait();
+
+        return;
+    }
+
+    UserRepository repository =
+            new UserRepository();
+
+    if (repository.existeUsuario(nombre)) {
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText(null);
+        alert.setContentText(
+                "Ya existe un usuario con ese nombre"
+        );
+        alert.showAndWait();
+
+        return;
+    }
+
+    user nuevoUsuario = new user(
+            repository.generarNuevoId(),
+            nombre,
+            password,
+            "CLIENTE",
+            apellido,
+            telefono,
+            direccion
+    );
+
+    repository.guardarUsuario(
+            nuevoUsuario
+    );
+
+    Alert alert = new Alert(
+            Alert.AlertType.INFORMATION
+    );
+
+    alert.setHeaderText(null);
+
+    alert.setContentText(
+            "Cuenta creada correctamente"
+    );
+
+    alert.showAndWait();
+
+    Router.goClientLogin();
+});
 
         // =====================================================
         // TEXTO LOGIN

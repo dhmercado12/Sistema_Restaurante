@@ -1,0 +1,2 @@
+1|admin|1234|ADMIN|||
+2|Dhery|12345|CLIENTE|Mercado|xxxxx|xxxxx

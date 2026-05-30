@@ -323,7 +323,7 @@ public class MenuClienteView {
         btn.setOnMouseEntered(e -> btn.setStyle(hover));
         btn.setOnMouseExited(e -> btn.setStyle(normal));
 
-        btn.setOnAction(e -> Router.goLogin());
+        btn.setOnAction(e -> Router.goClientLogin());
 
         return btn;
     }

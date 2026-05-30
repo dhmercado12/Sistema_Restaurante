@@ -26,7 +26,7 @@ public class StartView {
 
         Button loginBtn = new Button("Iniciar Sesión");
         loginBtn.setOnAction(e -> {
-              Router.goLogin();
+              Router.goClientLogin();
            });
         loginBtn.setStyle("""
             -fx-background-color: rgba(138,92,255,0.18);
@@ -83,7 +83,7 @@ public class StartView {
 
         Button primaryBtn = new Button("Explorar Sistema");
         primaryBtn.setOnAction(e -> {
-              Router.goLogin();
+              Router.goClientLogin();
            });
         primaryBtn.setStyle("""
             -fx-background-color: linear-gradient(to right, #8A5CFF, #00C2FF);

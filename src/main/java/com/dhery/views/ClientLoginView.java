@@ -1,6 +1,8 @@
 package com.dhery.views;
 
 import com.dhery.app.Router;
+import com.dhery.models.user;
+import com.dhery.repositories.UserRepository;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -183,7 +185,42 @@ title.setTextAlignment(TextAlignment.CENTER);
             );
         """);
           // ACCIÓN DEL BOTÓN LOGIN PARA CAJERO
-        loginBtn.setOnAction(e -> Router.goMenuClienteView());
+        loginBtn.setOnAction(e -> {
+
+    UserRepository repository =
+            new UserRepository();
+
+    user user = repository.login(
+            usernameField.getText().trim(),
+            passwordField.getText()
+    );
+
+    if (user == null) {
+
+        Alert alert = new Alert(
+                Alert.AlertType.ERROR
+        );
+
+        alert.setHeaderText(null);
+
+        alert.setContentText(
+                "Usuario o contraseña incorrectos"
+        );
+
+        alert.showAndWait();
+
+        return;
+    }
+
+    if (user.getRol().equals("ADMIN")) {
+
+        Router.goMenuCajeroView();
+
+    } else {
+
+        Router.goMenuClienteView();
+    }
+});
 
 
 
@@ -361,7 +398,7 @@ title.setTextAlignment(TextAlignment.CENTER);
         });
 
         backBtn.setOnAction(e -> {
-            Router.goLogin();
+            Router.goStart();
         });
 
         // =====================================================
