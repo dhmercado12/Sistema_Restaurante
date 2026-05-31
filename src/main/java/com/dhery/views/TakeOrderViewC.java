@@ -1,5 +1,8 @@
 package com.dhery.views;
 
+import java.util.List;
+
+import com.dhery.GestorArchivo.ArchivoManager;
 import com.dhery.app.Router;
 import javafx.beans.property.*;
 import javafx.collections.*;
@@ -8,14 +11,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
+import javafx.stage.Stage;
 
 public class TakeOrderViewC {
-
+  private static com.dhery.models.user currentUser;
     // ── Modelo ────────────────────────────────────────────────────────────────
     public static class OrderItem {
         private final StringProperty  producto = new SimpleStringProperty();
         private final IntegerProperty cantidad = new SimpleIntegerProperty();
         private final IntegerProperty precio   = new SimpleIntegerProperty();
+        
 
         public OrderItem(String producto, int cantidad, int precio) {
             this.producto.set(producto);
@@ -56,30 +61,39 @@ public class TakeOrderViewC {
     private static final String TEXT_G  = "#AAAAAA";
     private static final String TEXT_DK = "#1A1A1A";
 
-    public static Scene getScene() {
-        orderItems.clear();
-        subtotalLbl  = new Label("0 Bs");
-        deliveryLbl  = new Label("10 Bs");
-        totalLbl     = new Label("10 Bs");
-        entValLbl    = new Label("Delivery");
-        dirValLbl    = new Label("—");
-        nombreValLbl = new Label("—");
-        celValLbl    = new Label("—");
-        isDelivery   = true;
+    public static Scene getScene(com.dhery.models.user user) {
 
-        HBox root = new HBox(0);
-        root.setStyle("-fx-background-color: " + DARK_BG + ";");
+    currentUser = user;
 
-        VBox leftPanel = buildLeftPanel();
-        HBox.setHgrow(leftPanel, Priority.ALWAYS);
+    orderItems.clear();
 
-        VBox rightPanel = buildRightPanel();
-        rightPanel.setPrefWidth(380);
-        rightPanel.setMinWidth(380);
+    subtotalLbl  = new Label("0 Bs");
+    deliveryLbl  = new Label("10 Bs");
+    totalLbl     = new Label("10 Bs");
 
-        root.getChildren().addAll(leftPanel, rightPanel);
-        return new Scene(root, 1280, 720);
-    }
+    entValLbl    = new Label("Delivery");
+
+    nombreValLbl = new Label(user.getUsername() + " " + user.getApellidos());
+    dirValLbl    = new Label(user.getDireccion());
+    celValLbl    = new Label(user.getTelefono());
+
+    isDelivery = true;
+
+    HBox root = new HBox(0);
+    root.setStyle("-fx-background-color: " + DARK_BG + ";");
+
+    VBox leftPanel = buildLeftPanel();
+    VBox rightPanel = buildRightPanel();
+
+    HBox.setHgrow(leftPanel, Priority.ALWAYS);
+
+    rightPanel.setPrefWidth(380);
+    rightPanel.setMinWidth(380);
+
+    root.getChildren().addAll(leftPanel, rightPanel);
+
+    return new Scene(root, 1280, 720);
+}
 
     // ═══════════════════════════════════════════════════════════════════════════
     // PANEL IZQUIERDO
@@ -659,6 +673,14 @@ public class TakeOrderViewC {
             "-fx-background-color: #2E7D32; -fx-text-fill: white;" +
             " -fx-font-size: 11px; -fx-font-weight: bold;" +
             " -fx-background-radius: 8; -fx-cursor: hand;");
+            confirm.setOnAction(e -> {
+
+            generarFactura(); // 🔥 muestra factura
+         guardarFactura();
+         orderItems.clear(); // limpia carrito
+
+         refreshTotals();    // reinicia totales
+});
 
         Button cancel = new Button("✖  CANCELAR");
         cancel.setPrefHeight(46);
@@ -682,4 +704,159 @@ public class TakeOrderViewC {
         deliveryLbl.setText(delivery + " Bs");
         totalLbl.setText((sub + delivery) + " Bs");
     }
+    private static void generarFactura() {
+
+    Stage facturaStage = new Stage();
+
+    VBox root = new VBox(10);
+    root.setPadding(new Insets(20));
+    root.setStyle("-fx-background-color: white;");
+
+    // 🔥 ENCABEZADO EMPRESA
+    Label title = new Label("TACABRÓN RESTAURANTE");
+    title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+
+    Label subtitle = new Label("FACTURA DE PEDIDO");
+    subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #777;");
+
+    Separator sep1 = new Separator();
+
+    // 👤 CLIENTE
+    Label cliente = new Label("Cliente: " + nombreValLbl.getText());
+    Label direccion = new Label("Dirección: " + dirValLbl.getText());
+    Label celular = new Label("Tel: " + celValLbl.getText());
+
+    cliente.setStyle("-fx-font-size: 13px;");
+    direccion.setStyle("-fx-font-size: 13px;");
+    celular.setStyle("-fx-font-size: 13px;");
+
+    Separator sep2 = new Separator();
+
+    // 🧾 ITEMS
+    VBox itemsBox = new VBox(5);
+
+    for (OrderItem item : orderItems) {
+
+        Label line = new Label(
+                item.getProducto()
+                        + " x" + item.getCantidad()
+                        + "   ->   " + (item.getCantidad() * item.getPrecio()) + " Bs"
+        );
+
+        line.setStyle("-fx-font-size: 12px;");
+
+        itemsBox.getChildren().add(line);
+    }
+
+    Separator sep3 = new Separator();
+
+    // 💰 TOTAL
+    int total = 0;
+
+    for (OrderItem item : orderItems) {
+        total += item.getCantidad() * item.getPrecio();
+    }
+
+    int delivery = isDelivery ? 10 : 0;
+
+    Label totalLblFinal = new Label(
+            "TOTAL: " + (total + delivery) + " Bs"
+    );
+
+    totalLblFinal.setStyle(
+            "-fx-font-size: 18px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-text-fill: #2E7D32;"
+    );
+
+    Label gracias = new Label("¡Gracias por su compra en Tacabrón!");
+    gracias.setStyle("-fx-font-size: 12px; -fx-text-fill: #555;");
+
+    Button btnCerrar = new Button("Cerrar");
+    btnCerrar.setStyle("-fx-background-color: #CC0000; -fx-text-fill: white;");
+    btnCerrar.setOnAction(e -> facturaStage.close());
+
+    root.getChildren().addAll(
+            title,
+            subtitle,
+            sep1,
+            cliente,
+            direccion,
+            celular,
+            sep2,
+            itemsBox,
+            sep3,
+            totalLblFinal,
+            gracias,
+            btnCerrar
+    );
+
+    Scene scene = new Scene(root, 350, 500);
+    facturaStage.setTitle("Factura Tacabrón");
+    facturaStage.setScene(scene);
+    facturaStage.show();
+}
+private static void guardarFactura() {
+
+    ArchivoManager archivo = new ArchivoManager();
+
+    String fecha = java.time.LocalDate.now().toString();
+
+    int subtotal = 0;
+
+    StringBuilder detalle = new StringBuilder();
+
+    for (OrderItem item : orderItems) {
+
+        int totalItem = item.getCantidad() * item.getPrecio();
+
+        subtotal += totalItem;
+
+        detalle.append(item.getProducto())
+               .append(" x")
+               .append(item.getCantidad())
+               .append(", ");
+    }
+
+    int delivery = isDelivery ? 10 : 0;
+
+    int total = subtotal + delivery;
+
+    int idFactura = generarIdFactura(); // lo hacemos abajo
+
+    String linea = idFactura + "|"
+            + currentUser.getId() + "|"
+            + fecha + "|"
+            + total + "|"
+            + (isDelivery ? "DELIVERY" : "LOCAL") + "|"
+            + detalle;
+
+    archivo.agregarLinea(
+            "src/main/java/com/dhery/GestorArchivo/facturas.txt",
+            linea
+    );
+}
+private static int generarIdFactura() {
+
+    ArchivoManager archivo = new ArchivoManager();
+
+    List<String> lineas = archivo.leerLineas(
+            "src/main/java/com/dhery/GestorArchivo/facturas.txt"
+    );
+
+    int max = 0;
+
+    for (String l : lineas) {
+
+        String[] p = l.split("\\|");
+
+        int id = Integer.parseInt(p[0]);
+
+        if (id > max) {
+            max = id;
+        }
+    }
+
+    return max + 1;
+}
 }

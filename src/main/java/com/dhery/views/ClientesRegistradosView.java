@@ -9,6 +9,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import com.dhery.models.user;
+import com.dhery.repositories.UserRepository;
+import com.dhery.views.ClientesRegistradosView.Cliente;
 
 public class ClientesRegistradosView {
 
@@ -46,7 +49,18 @@ public class ClientesRegistradosView {
     @SuppressWarnings("unchecked")
     public static Scene getScene() {
         currentPage    = 0;
-        allClientes    = buildSampleClientes();
+        UserRepository repo = new UserRepository();
+
+allClientes = FXCollections.observableArrayList(
+        repo.listarUsuarios()
+                .stream()
+                .map(u -> new Cliente(
+                        u.getId(),
+                        u.getUsername(),
+                        u.getTelefono()
+                ))
+                .collect(java.util.stream.Collectors.toList())
+);
         filteredClientes = FXCollections.observableArrayList(allClientes);
         pageClientes   = FXCollections.observableArrayList();
         refreshPage();
@@ -319,28 +333,5 @@ public class ClientesRegistradosView {
     }
 
     // ── Datos de muestra ─────────────────────────────────────────────────────
-    private static ObservableList<Cliente> buildSampleClientes() {
-        return FXCollections.observableArrayList(
-            new Cliente(1,  "Jhon Alan",        "71234567"),
-            new Cliente(2,  "Omar Mirko",        "73098765"),
-            new Cliente(3,  "Dhery",             "71567890"),
-            new Cliente(4,  "Marcelo",           "70123456"),
-            new Cliente(5,  "Alejandra Gomez",   "68901234"),
-            new Cliente(6,  "Luis Fernando",     "77700123"),
-            new Cliente(7,  "Maria Jose",        "75654321"),
-            new Cliente(8,  "Carlos Eduardo",    "70876543"),
-            new Cliente(9,  "Daniela Torres",    "74561234"),
-            new Cliente(10, "Pedro Antonio",     "76098712"),
-            new Cliente(11, "Vanessa Rodriguez", "69912345"),
-            new Cliente(12, "Miguel Angel",      "72233445"),
-            new Cliente(13, "Sofia Martinez",    "67345678"),
-            new Cliente(14, "Juan Pablo",        "74112233"),
-            new Cliente(15, "Eliana Gutierrez",  "68877655"),
-            new Cliente(16, "Roberto Flores",    "71234890"),
-            new Cliente(17, "Carmen Vargas",     "76543210"),
-            new Cliente(18, "Diego Mendez",      "70011223"),
-            new Cliente(19, "Lucia Perez",       "77889900"),
-            new Cliente(20, "Andres Castro",     "68776655")
-        );
-    }
+    
 }

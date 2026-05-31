@@ -15,10 +15,14 @@ import com.dhery.views.MostrarMenu;
 import com.dhery.views.HistorialVentasView;
 import com.dhery.views.ClientesRegistradosView;
 import com.dhery.views.FacturasGuardadasView;
+import com.dhery.views.MisPedidosView;
 
 
 public class Router {
-
+    private static com.dhery.models.user currentUser;
+public static void setUser(com.dhery.models.user user) {
+    currentUser = user;
+}
     public enum Role {
         CAJERO,
         CLIENTE
@@ -69,8 +73,8 @@ public static void goTakeOrderView() {
     stage.setTitle("Tacabrón - Tomar Pedido");
 }
 
-public static void goTakeOrderViewC() {
-    stage.setScene(TakeOrderViewC.getScene());
+public static void goTakeOrderViewC(com.dhery.models.user user) {
+    stage.setScene(TakeOrderViewC.getScene(user));
     stage.setTitle("Tacabrón - realizar Pedido");
 }
 
@@ -85,7 +89,7 @@ public static void goOrderStatusView() {
     }
 
     public static void goMenuClienteView() {
-        stage.setScene(MenuClienteView.getScene());
+        stage.setScene(MenuClienteView.getScene(currentUser));
         stage.setTitle("Tacabrón - Menú Cliente");
     }
 
@@ -114,5 +118,10 @@ public static void goOrderStatusView() {
         stage.setScene(FacturasGuardadasView.getScene());
         stage.setTitle("Tacabrón - Facturas Guardadas");
     }
+    public static void goMisFacturas() {
+        stage.setScene(MisPedidosView.getScene(currentUser));
+        stage.setTitle("Tacabrón - Mis Pedidos");
+    }
+    
 
 }

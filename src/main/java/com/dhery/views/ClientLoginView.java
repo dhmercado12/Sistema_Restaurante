@@ -211,7 +211,8 @@ title.setTextAlignment(TextAlignment.CENTER);
 
         return;
     }
-
+        Router.setUser(user);
+        
     if (user.getRol().equals("ADMIN")) {
 
         Router.goMenuCajeroView();

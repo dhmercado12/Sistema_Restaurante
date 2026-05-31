@@ -1,6 +1,8 @@
 package com.dhery.views;
 
 import com.dhery.app.Router;
+import com.dhery.models.user;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,8 +15,9 @@ import javafx.scene.text.TextAlignment;
 
 public class MenuClienteView {
 
-    public static Scene getScene() {
-
+    private static com.dhery.models.user currentUser;
+    public static Scene getScene(com.dhery.models.user user) {
+        currentUser = user;
         // ── ROOT ──────────────────────────────────────────────────────────────
         StackPane root = new StackPane();
         root.setStyle("-fx-background-color: #FFFFFF;");
@@ -214,16 +217,16 @@ public class MenuClienteView {
         // ── ACCIONES ─────────────────────────────────────────
 
         if (title.equals("REALIZAR PEDIDO")) {
-            card.setOnMouseClicked(e -> Router.goTakeOrderViewC());
+            card.setOnMouseClicked(e -> Router.goTakeOrderViewC(currentUser));
 
         } else if (title.equals("VER MENÚ")) {
            card.setOnMouseClicked(e -> Router.goMostrarMenu());
 
         } else if (title.equals("VER MIS PEDIDOS")) {
-            //card.setOnMouseClicked(e -> Router.goMyOrdersView());
+            card.setOnMouseClicked(e -> Router.goMisFacturas());
 
         } else if (title.equals("MIS DATOS")) {
-          //  card.setOnMouseClicked(e -> Router.goMyDataView());
+           // card.setOnMouseClicked(e -> Router.goMisFacturas());
 
         } else if (title.equals("REALIZAR SUGERENCIA")) {
            card.setOnMouseClicked(e -> Router.goSuggestionView());
