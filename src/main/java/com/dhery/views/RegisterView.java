@@ -64,6 +64,8 @@ public class RegisterView {
 // NOMBRES
 // =====================================================
 Label namesLabel = new Label("Nombres");
+namesLabel.setMaxWidth(280);
+namesLabel.setAlignment(Pos.CENTER_LEFT);
 
 namesLabel.setTextFill(Color.web("#4A403A"));
 
@@ -81,6 +83,8 @@ styleField(namesField);
 // APELLIDOS
 // =====================================================
 Label lastNameLabel = new Label("Apellidos");
+lastNameLabel.setMaxWidth(280);
+lastNameLabel.setAlignment(Pos.CENTER_LEFT);
 
 lastNameLabel.setTextFill(Color.web("#4A403A"));
 
@@ -99,6 +103,9 @@ styleField(lastNameField);
 // =====================================================
 Label phoneLabel = new Label("Teléfono");
 
+phoneLabel.setMaxWidth(280);
+phoneLabel.setAlignment(Pos.CENTER_LEFT);
+
 phoneLabel.setTextFill(Color.web("#4A403A"));
 
 phoneLabel.setFont(
@@ -115,6 +122,8 @@ styleField(phoneField);
 // DIRECCIÓN
 // =====================================================
 Label addressLabel = new Label("Dirección");
+addressLabel.setMaxWidth(280);
+addressLabel.setAlignment(Pos.CENTER_LEFT);
 
 addressLabel.setTextFill(Color.web("#4A403A"));
 
@@ -132,6 +141,8 @@ styleField(addressField);
 // CONTRASEÑA
 // =====================================================
 Label passLabel = new Label("Contraseña");
+passLabel.setMaxWidth(280);
+passLabel.setAlignment(Pos.CENTER_LEFT);
 
 passLabel.setTextFill(Color.web("#4A403A"));
 
@@ -149,7 +160,8 @@ styleField(passwordField);
 // CONFIRMAR CONTRASEÑA
 // =====================================================
 Label confirmLabel = new Label("Confirmar contraseña");
-
+confirmLabel.setMaxWidth(280);
+confirmLabel.setAlignment(Pos.CENTER_LEFT);
 confirmLabel.setTextFill(Color.web("#4A403A"));
 
 confirmLabel.setFont(
@@ -552,7 +564,8 @@ styleField(confirmField);
     // =====================================================
     private static void styleField(TextField field) {
 
-        field.setPrefWidth(360);
+        field.setPrefWidth(300);
+        field.setMaxWidth(300);
 
         field.setPrefHeight(52);
 

@@ -226,7 +226,7 @@ public class MenuClienteView {
             card.setOnMouseClicked(e -> Router.goMisFacturas());
 
         } else if (title.equals("MIS DATOS")) {
-           // card.setOnMouseClicked(e -> Router.goMisFacturas());
+           card.setOnMouseClicked(e -> Router.goMisDatos(currentUser));
 
         } else if (title.equals("REALIZAR SUGERENCIA")) {
            card.setOnMouseClicked(e -> Router.goSuggestionView());

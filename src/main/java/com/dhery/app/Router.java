@@ -4,11 +4,13 @@ import com.dhery.views.StartView;
 import javafx.stage.Stage;
 
 import com.dhery.views.ClientLoginView;
+import com.dhery.models.user;
 import com.dhery.utils.TakeOrderView;
 import com.dhery.views.TakeOrderViewC;
 import com.dhery.views.RegisterView;
 import com.dhery.views.MenuCajeroView;
 import com.dhery.views.MenuClienteView;
+import com.dhery.views.MisDatosView;
 import com.dhery.views.StockView;
 import com.dhery.views.SuggestionView;
 import com.dhery.views.MostrarMenu;
@@ -16,6 +18,9 @@ import com.dhery.views.HistorialVentasView;
 import com.dhery.views.ClientesRegistradosView;
 import com.dhery.views.FacturasGuardadasView;
 import com.dhery.views.MisPedidosView;
+import com.dhery.views.MisDatosView;
+import com.dhery.views.EditarDatosView;
+
 
 
 public class Router {
@@ -122,6 +127,15 @@ public static void goOrderStatusView() {
         stage.setScene(MisPedidosView.getScene(currentUser));
         stage.setTitle("Tacabrón - Mis Pedidos");
     }
+    public static void goMisDatos(user currentUser) {
+    stage.setScene(MisDatosView.getScene(currentUser));
+    stage.setTitle("Tacabrón - Mis Datos");
+}
+
+public static void goMisDatosEdit(user currentUser) {
+    stage.setScene(EditarDatosView.getScene(currentUser));
+    stage.setTitle("Tacabrón - Editar Mis Datos");
+}
     
 
 }

@@ -594,16 +594,40 @@ public class MisPedidosView {
         ObservableList<String[]> items = FXCollections.observableArrayList();
         if (p.getDetalle() != null && !p.getDetalle().isBlank()) {
             for (String item : p.getDetalle().split(",")) {
-                item = item.trim();
-                int xIdx = item.lastIndexOf(" x");
-                if (xIdx != -1) {
-                    String nombre = capitalize(item.substring(0, xIdx).trim());
-                    String cant   = item.substring(xIdx + 2).trim();
-                    items.add(new String[]{nombre, cant, "—"});
-                } else {
-                    items.add(new String[]{capitalize(item), "1", "—"});
-                }
-            }
+
+    item = item.trim();
+
+    if (item.isEmpty()) {
+        continue;
+    }
+
+    int xIdx = item.lastIndexOf(" x");
+
+    if (xIdx != -1) {
+
+        String nombre = capitalize(
+                item.substring(0, xIdx).trim()
+        );
+
+        String cant = item.substring(
+                xIdx + 2
+        ).trim();
+
+        items.add(new String[]{
+                nombre,
+                cant,
+                "—"
+        });
+
+    } else {
+
+        items.add(new String[]{
+                capitalize(item),
+                "1",
+                "—"
+        });
+    }
+}
         }
         tbl.setItems(items);
         tbl.setPrefHeight(items.size() * 40 + 35);
