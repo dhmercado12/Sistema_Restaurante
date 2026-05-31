@@ -161,6 +161,12 @@ public class MenuCajeroView {
         card.setOnMouseClicked(e -> Router.goStockView());
     } else if (title.equals("TOMAR EL PEDIDO")) {
         card.setOnMouseClicked(e -> Router.goTakeOrderView());
+    } else if (title.equals("HISTORIAL DE VENTAS")) {
+    card.setOnMouseClicked(e -> Router.goHistorialVentasView());
+    } else if (title.equals("CLIENTES REGISTRADOS")) {
+    card.setOnMouseClicked(e -> Router.goClientesRegistradosView());
+    } else if (title.equals("FACTURAS GUARDADAS")) {
+    card.setOnMouseClicked(e -> Router.goFacturasGuardadasView());
     }
 
     // ── Ícono con fondo circular ──

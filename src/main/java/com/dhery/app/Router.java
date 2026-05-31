@@ -14,7 +14,7 @@ import com.dhery.views.SuggestionView;
 import com.dhery.views.MostrarMenu;
 import com.dhery.views.HistorialVentasView;
 import com.dhery.views.ClientesRegistradosView;
-import com.dhery.views.FacturasGuardadasView;s
+import com.dhery.views.FacturasGuardadasView;
 
 
 public class Router {
