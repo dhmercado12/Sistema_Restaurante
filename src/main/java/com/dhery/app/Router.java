@@ -12,6 +12,9 @@ import com.dhery.views.MenuClienteView;
 import com.dhery.views.StockView;
 import com.dhery.views.SuggestionView;
 import com.dhery.views.MostrarMenu;
+import com.dhery.views.HistorialVentasView;
+import com.dhery.views.ClientesRegistradosView;
+import com.dhery.views.FacturasGuardadasView;s
 
 
 public class Router {
@@ -94,6 +97,22 @@ public static void goOrderStatusView() {
     public static void goMostrarMenu() {
         stage.setScene(MostrarMenu.getScene());
         stage.setTitle("Tacabrón - Menú");
+    }
+
+    //----PANTALLA DE HISTORIAL DE VENTAS ----  
+    public static void goHistorialVentasView() {
+        stage.setScene(HistorialVentasView.getScene());
+        stage.setTitle("Tacabrón - Historial de Ventas");
+    }
+    //-----PANTALLA DE CLIENTES REGISTRADOS-----
+    public static void goClientesRegistradosView() {
+        stage.setScene(ClientesRegistradosView.getScene());
+        stage.setTitle("Tacabrón - Clientes Registrados");
+    }
+    //-----PANTALLA DE FACTURAS GUARDADAS-----
+    public static void goFacturasGuardadasView() {
+        stage.setScene(FacturasGuardadasView.getScene());
+        stage.setTitle("Tacabrón - Facturas Guardadas");
     }
 
 }
