@@ -1,3 +1,4 @@
 1|admin|1234|ADMIN|||
 2|Dhery|12345|CLIENTE|Mercado|68507260|sacaba
 3|Juan|12|CLIENTE|Perez|68507260|Cochabamba -  Quillacollo
+4|Walter|walter123|CLIENTE|Alcoba|5786|xxxxxxxx
