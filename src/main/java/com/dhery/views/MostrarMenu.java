@@ -6,803 +6,954 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.scene.image.ImageView;
 
 public class MostrarMenu {
+
+    // ═══════════════════════════════════════════════════════════
+    //  PALETA  BOLIVIA × MÉXICO
+    //  
+    // ═══════════════════════════════════════════════════════════
+    private static final String ROJO   = "#C8102E";
+    private static final String VERDE  = "#1A6B3C";
+    private static final String ORO    = "#D4A017";
+    private static final String BG     = "#F5EDD8";
+    private static final String CARD   = "#FFFFFF";
+    private static final String ROW    = "#FBF5EC";
+    private static final String DARK   = "#2C1A0E";
 
     private static boolean isGridMode = true;
 
     public static Scene getScene() {
 
-        // =====================================================
-        // ROOT GENERAL
-        // =====================================================
+        VBox container = new VBox(14);
+        container.setPadding(new Insets(16));
+        container.setStyle("-fx-background-color: " + BG + ";");
 
-        VBox container = new VBox(15);
-
-        container.setPadding(new Insets(15));
-
-        container.setStyle(
-                "-fx-background-color: #F5E8D7;"
-        );
-
-        // =====================================================
-        // TOP BAR
-        // =====================================================
-
-        HBox topBar = new HBox();
-
+        // ─── TOP BAR ──────────────────────────────────────────
+        HBox topBar = new HBox(10);
         topBar.setAlignment(Pos.CENTER_LEFT);
 
-        Region topSpacer = new Region();
+        Button backBtn = new Button("← VOLVER");
+        backBtn.setStyle(
+            "-fx-background-color: " + ROJO + ";" +
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 13px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 10;" +
+            "-fx-cursor: hand;" +
+            "-fx-padding: 9 18 9 18;"
+        );
+        backBtn.setOnAction(e -> Router.goMenuClienteView());
 
+        Label menuTitle = new Label("MENÚ TACABRON");
+menuTitle.setStyle(
+    "-fx-font-size: 28px;" +
+    "-fx-font-weight: bold;" +
+    "-fx-text-fill: " + ROJO + ";" +
+    "-fx-letter-spacing: 3;"
+);
+
+Label subTitle = new Label(
+    "Auténtica comida mexicana preparada con pasión y tradición"
+);
+
+subTitle.setStyle(
+    "-fx-font-size: 13px;" +
+    "-fx-text-fill: #6B5A4A;" +
+    "-fx-font-style: italic;"
+);
+
+HBox flagStripe = buildBoliviaFlag();
+flagStripe.setAlignment(Pos.CENTER);
+
+VBox titleBox = new VBox(5);
+titleBox.setAlignment(Pos.CENTER);
+titleBox.getChildren().addAll(
+    menuTitle,
+    subTitle,
+    flagStripe
+);
+
+        // Mini franja tricolor Bolivia–México centrada
+        
+        Region topSpacer = new Region();
         HBox.setHgrow(topSpacer, Priority.ALWAYS);
 
-        Button gridBtn = new Button("☷");
+        Button gridBtn = new Button("⊞");
         Button listBtn = new Button("☰");
-        Button backBtn = new Button("← VOLVER");
+        styleToggle(gridBtn, true);
+        styleToggle(listBtn, false);
 
-        String btnStyle =
-                "-fx-background-color: white;" +
-                "-fx-font-size: 18px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-background-radius: 12;" +
-                "-fx-cursor: hand;" +
-                "-fx-padding: 8 14 8 14;";
+        Region leftSpacer = new Region();
+Region rightSpacer = new Region();
 
-        gridBtn.setStyle(btnStyle);
-        listBtn.setStyle(btnStyle);
+HBox.setHgrow(leftSpacer, Priority.ALWAYS);
+HBox.setHgrow(rightSpacer, Priority.ALWAYS);
 
-         backBtn.setStyle(
-        "-fx-background-color: #CC0000;" +
-        "-fx-text-fill: white;" +
-        "-fx-font-size: 14px;" +
-        "-fx-font-weight: bold;" +
-        "-fx-background-radius: 12;" +
-        "-fx-cursor: hand;" +
-        "-fx-padding: 8 16 8 16;"
-         );
-         backBtn.setOnAction(e -> {
-         Router.goMenuClienteView();
-         });
-
-        topBar.getChildren().addAll(
-        backBtn,
-        topSpacer,
-        gridBtn,
-        listBtn
-        );
-
-        // =====================================================
-        // CONTENIDO
-        // =====================================================
-
-        HBox content = new HBox(15);
-
+topBar.getChildren().addAll(
+    backBtn,
+    leftSpacer,
+    titleBox,
+    rightSpacer,
+    gridBtn,
+    listBtn
+);
+        // ─── CONTENIDO ────────────────────────────────────────
+        HBox content = new HBox(14);
         content.setAlignment(Pos.TOP_CENTER);
-
-        VBox platos = buildPlatosColumn();
-        VBox bebidas = buildBebidasColumn();
-        VBox promos = buildPromosColumn();
-
         content.getChildren().addAll(
-                platos,
-                bebidas,
-                promos
+            buildPlatosColumn(),
+            buildBebidasColumn(),
+            buildPromosColumn()
         );
 
-        // =====================================================
-        // BOTON GRID
-        // =====================================================
-
+        // ─── TOGGLE GRID ──────────────────────────────────────
         gridBtn.setOnAction(e -> {
-
             if (isGridMode) return;
-
             isGridMode = true;
-
+            styleToggle(gridBtn, true);
+            styleToggle(listBtn, false);
             content.getChildren().clear();
-
-            content.setSpacing(15);
-
+            content.setSpacing(14);
+            content.setAlignment(Pos.TOP_CENTER);
             content.getChildren().addAll(
-                    buildPlatosColumn(),
-                    buildBebidasColumn(),
-                    buildPromosColumn()
+                buildPlatosColumn(),
+                buildBebidasColumn(),
+                buildPromosColumn()
             );
         });
 
-        // =====================================================
-        // BOTON LISTA
-        // =====================================================
-
+        // ─── TOGGLE LISTA ─────────────────────────────────────
         listBtn.setOnAction(e -> {
+            if (!isGridMode) return;
+            isGridMode = false;
+            styleToggle(gridBtn, false);
+            styleToggle(listBtn, true);
+            content.getChildren().clear();
+            content.setSpacing(0);
+            content.setAlignment(Pos.TOP_CENTER);
 
-    if (!isGridMode) return;
+            VBox mainList = new VBox(14);
+            mainList.setPrefWidth(1000);
+            mainList.setAlignment(Pos.TOP_CENTER);
+            mainList.getChildren().addAll(
+                buildListSection("🌮", "PLATOS",      ROJO,  buildPlatosListGrid()),
+                buildListSection("🥤", "BEBIDAS",     VERDE, buildBebidasListGrid()),
+                buildListSection("🔥", "PROMOCIONES", ORO,   buildPromosListGrid())
+            );
+            content.getChildren().add(mainList);
+        });
 
-    isGridMode = false;
-
-    content.getChildren().clear();
-
-    VBox mainList = new VBox(16);
-
-mainList.setPrefWidth(950);
-
-mainList.setAlignment(Pos.CENTER);
-
-HBox wrapper = new HBox(mainList);
-
-wrapper.setAlignment(Pos.TOP_CENTER);
-
-wrapper.setPrefWidth(1200);
-
-    // =====================================================
-    // PLATOS
-    // =====================================================
-
-    VBox platosSection = buildCompactListSection(
-            "🌮",
-            "PLATOS",
-            "#FF5A00"
-    );
-
-    GridPane platosGrid = new GridPane();
-
-    platosGrid.setHgap(10);
-    platosGrid.setVgap(10);
-
-    platosGrid.add(buildCompactListItem(
-            "Nachos Supremos",
-            "Bs 45"
-    ), 0, 0);
-
-    platosGrid.add(buildCompactListItem(
-            "MegaBurrito",
-            "Bs 45"
-    ), 1, 0);
-
-    platosGrid.add(buildCompactListItem(
-            "RamenBirria",
-            "Bs 35"
-    ), 0, 1);
-
-    platosGrid.add(buildCompactListItem(
-            "Tacobirria",
-            "Bs 15"
-    ), 1, 1);
-
-    platosGrid.add(buildCompactListItem(
-            "Quesabirria",
-            "Bs 15"
-    ), 0, 2);
-
-    platosGrid.add(buildCompactListItem(
-            "Suadero",
-            "Bs 15"
-    ), 1, 2);
-
-    platosGrid.add(buildCompactListItem(
-            "Pastor",
-            "Bs 15"
-    ), 0, 3);
-
-    platosGrid.add(buildCompactListItem(
-            "Lengua",
-            "Bs 15"
-    ), 1, 3);
-
-    platosSection.getChildren().add(platosGrid);
-
-    // =====================================================
-    // BEBIDAS
-    // =====================================================
-
-    VBox bebidasSection = buildCompactListSection(
-            "🥤",
-            "BEBIDAS",
-            "#6E2EBB"
-    );
-
-    GridPane bebidasGrid = new GridPane();
-
-    bebidasGrid.setHgap(10);
-    bebidasGrid.setVgap(10);
-
-    bebidasGrid.add(buildCompactListItem(
-            "Horchata",
-            "Bs 8"
-    ), 0, 0);
-
-    bebidasGrid.add(buildCompactListItem(
-            "Jamaica",
-            "Bs 8"
-    ), 1, 0);
-
-    bebidasSection.getChildren().add(bebidasGrid);
-
-    // =====================================================
-    // PROMOCIONES
-    // =====================================================
-
-    VBox promoSection = buildCompactListSection(
-            "🔥",
-            "PROMOCIONES",
-            "#248A1D"
-    );
-
-    GridPane promoGrid = new GridPane();
-
-    promoGrid.setHgap(10);
-    promoGrid.setVgap(10);
-
-    promoGrid.add(buildCompactListItem(
-            "Combo Nachos",
-            "Bs 70"
-    ), 0, 0);
-
-    promoGrid.add(buildCompactListItem(
-            "Combo Burrito",
-            "Bs 70"
-    ), 1, 0);
-
-    promoSection.getChildren().add(promoGrid);
-
-    // =====================================================
-
-    mainList.getChildren().addAll(
-            platosSection,
-            bebidasSection,
-            promoSection
-    );
-
-    content.getChildren().add(wrapper);
-});
-
-        container.getChildren().addAll(
-                topBar,
-                content
-        );
-
+        container.getChildren().addAll(topBar, content);
         return new Scene(container, 1280, 720);
     }
 
-    // =========================================================
-    // PLATOS
-    // =========================================================
+    // ═══════════════════════════════════════════════════════════
+    //  FRANJA TRICOLOR DECORATIVA
+    // ═══════════════════════════════════════════════════════════
+    private static HBox buildBoliviaFlag() {
+
+    HBox stripe = new HBox();
+    stripe.setPrefWidth(120);
+    stripe.setPrefHeight(8);
+
+    Region red = new Region();
+    Region yellow = new Region();
+    Region green = new Region();
+
+    HBox.setHgrow(red, Priority.ALWAYS);
+    HBox.setHgrow(yellow, Priority.ALWAYS);
+    HBox.setHgrow(green, Priority.ALWAYS);
+
+    red.setStyle(
+        "-fx-background-color: #D52B1E;" +
+        "-fx-background-radius: 4 0 0 4;"
+    );
+
+    yellow.setStyle(
+        "-fx-background-color: #F9E300;"
+    );
+
+    green.setStyle(
+        "-fx-background-color: #007934;" +
+        "-fx-background-radius: 0 4 4 0;"
+    );
+
+    stripe.getChildren().addAll(red, yellow, green);
+
+    return stripe;
+}
+
+    // ═══════════════════════════════════════════════════════════
+    //  GRID — COLUMNAS
+    // ═══════════════════════════════════════════════════════════
 
     private static VBox buildPlatosColumn() {
+        VBox col = buildColumnBase(ROJO);
+        col.getChildren().add(buildHeader("🌮", "PLATOS", ROJO, false));
+        col.getChildren().add(buildColorStripe(VERDE, "white", ROJO));
 
-        VBox column = buildColumnBase();
-
-        HBox header = buildHeader(
-                "🌮",
-                "PLATOS",
-                "#FF5A00"
-        );
-
-        VBox items = new VBox(10);
-
-        items.setPadding(new Insets(16));
-
+        VBox items = new VBox(8);
+        items.setPadding(new Insets(14));
+        // Precios premium en rojo, intermedios en oro, básicos en verde
         items.getChildren().addAll(
 
-                buildFoodItem("1", "Nachos Supremos", "Bs 45"),
-                buildFoodItem("2", "MegaBurrito", "Bs 45"),
-                buildFoodItem("3", "RamenBirria", "Bs 35"),
-                buildFoodItem("4", "Tacobirria", "Bs 15"),
-                buildFoodItem("5", "Quesabirria", "Bs 15"),
-                buildFoodItem("6", "Suadero", "Bs 15"),
-                buildFoodItem("7", "Pastor", "Bs 15"),
-                buildFoodItem("8", "Lengua", "Bs 15")
-        );
+    buildFoodRow(
+        "1",
+        "Nachos Supremos",
+        "Bs 45",
+        ROJO,
+        "/images/nachos-supremos.jpg"
+    ),
 
-        column.getChildren().addAll(
-                header,
-                items
-        );
+    buildFoodRow(
+        "2",
+        "MegaBurrito",
+        "Bs 45",
+        ROJO,
+        "/images/megaburrito.jpg"
+    ),
 
-        return column;
+    buildFoodRow(
+        "3",
+        "RamenBirria",
+        "Bs 35",
+        ROJO,
+        "/images/ramenbirria.jpg"
+    ),
+
+    buildFoodRow(
+        "4",
+        "Tacobirria",
+        "Bs 15",
+        ORO,
+        "/images/tacobirria.jpg"
+    ),
+
+    buildFoodRow(
+        "5",
+        "Quesabirria",
+        "Bs 15",
+        ORO,
+        "/images/quesabirria.jpg"
+    ),
+
+    buildFoodRow(
+        "6",
+        "Suadero",
+        "Bs 15",
+        ORO,
+        "/images/suadero.jpg"
+    ),
+
+    buildFoodRow(
+        "7",
+        "Pastor",
+        "Bs 15",
+        VERDE,
+        "/images/pastor.jpg"
+    ),
+
+    buildFoodRow(
+        "8",
+        "Lengua",
+        "Bs 15",
+        VERDE,
+        "/images/lengua.jpg"
+    )
+);
+        col.getChildren().add(items);
+        return col;
     }
-
-    // =========================================================
-    // BEBIDAS
-    // =========================================================
 
     private static VBox buildBebidasColumn() {
+        VBox col = buildColumnBase(VERDE);
+        col.getChildren().add(buildHeader("🥤", "BEBIDAS", VERDE, false));
+        col.getChildren().add(buildColorStripe(ROJO, "white", VERDE));
 
-        VBox column = buildColumnBase();
-
-        HBox header = buildHeader(
-                "🥤",
-                "BEBIDAS",
-                "#6E2EBB"
-        );
-
-        VBox items = new VBox(18);
-
+        VBox items = new VBox(14);
         items.setAlignment(Pos.TOP_CENTER);
-
         items.setPadding(new Insets(16));
-
         items.getChildren().addAll(
 
-                buildDrinkCard(
-                        "11",
-                        "Horchata",
-                        "Bs 8"
-                ),
+    buildDrinkCard(
+        "11",
+        "Horchata",
+        "Bs 8",
+        "/images/horchata.jpg"
+    ),
 
-                buildDrinkCard(
-                        "12",
-                        "Jamaica",
-                        "Bs 8"
-                )
-        );
+    buildDrinkCard(
+        "12",
+        "Jamaica",
+        "Bs 8",
+        "/images/jamaica.jpg"
+    )
 
-        column.getChildren().addAll(
-                header,
-                items
-        );
-
-        return column;
+);
+        col.getChildren().add(items);
+        return col;
     }
-
-    // =========================================================
-    // PROMOS
-    // =========================================================
 
     private static VBox buildPromosColumn() {
+        VBox col = buildColumnBase(ORO);
+        col.getChildren().add(buildHeader("🔥", "PROMOCIONES", ORO, true)); // texto oscuro sobre oro
+        col.getChildren().add(buildColorStripe(VERDE, ROJO, ORO));
 
-        VBox column = buildColumnBase();
-
-        HBox header = buildHeader(
-                "🔥",
-                "PROMOCIONES",
-                "#248A1D"
-        );
-
-        VBox items = new VBox(16);
-
+        VBox items = new VBox(14);
         items.setPadding(new Insets(16));
-
         items.getChildren().addAll(
 
-                buildPromoCard(
-                        "13",
-                        "Nachos Supremos",
-                        "COMBO 2",
-                        "Bs 70"
-                ),
+    buildPromoCard(
+        "13",
+        "Nachos Supremos",
+        "COMBO 2",
+        "Bs 70",
+        "/images/nachos-supremos.jpg"
+    ),
 
-                buildPromoCard(
-                        "14",
-                        "MegaBurrito",
-                        "COMBO 2",
-                        "Bs 70"
-                )
-        );
+    buildPromoCard(
+        "14",
+        "MegaBurrito",
+        "COMBO 2",
+        "Bs 70",
+        "/images/megaburrito.jpg"
+    )
 
-        column.getChildren().addAll(
-                header,
-                items
-        );
-
-        return column;
+);
+        col.getChildren().add(items);
+        return col;
     }
 
-    // =========================================================
-    // BASE COLUMNA
-    // =========================================================
-
-    private static VBox buildColumnBase() {
-
-        VBox column = new VBox();
-
-        // TODAS IGUALES
-        column.setPrefWidth(350);
-        column.setMinWidth(350);
-        column.setMaxWidth(350);
-
-        column.setStyle(
-                "-fx-background-color: #FFF9F2;" +
-                "-fx-background-radius: 22;" +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08),10,0,0,3);"
+    // ─── Base de columna ──────────────────────────────────────
+    private static VBox buildColumnBase(String accentColor) {
+        VBox col = new VBox();
+        col.setPrefWidth(360);
+        col.setMinWidth(360);
+        col.setMaxWidth(360);
+        col.setStyle(
+            "-fx-background-color: " + CARD + ";" +
+            "-fx-background-radius: 20;" +
+            "-fx-border-color: " + accentColor + ";" +
+            "-fx-border-width: 0 0 0 4;" +   // acento izquierdo
+            "-fx-border-radius: 20;" +
+            "-fx-effect: dropshadow(gaussian, rgba(44,26,14,0.12), 14, 0, 0, 5);"
         );
-
-        return column;
+        return col;
     }
 
-    // =========================================================
-    // HEADER
-    // =========================================================
-
-    private static HBox buildHeader(
-            String icon,
-            String title,
-            String color
-    ) {
-
-        HBox header = new HBox(10);
-
+    // ─── Header ───────────────────────────────────────────────
+    private static HBox buildHeader(String icon, String title, String bg, boolean darkText) {
+        HBox header = new HBox(12);
         header.setAlignment(Pos.CENTER_LEFT);
-
-        header.setPadding(new Insets(15));
-
+        header.setPadding(new Insets(14, 18, 14, 18));
         header.setStyle(
-                "-fx-background-color: " + color + ";" +
-                "-fx-background-radius: 22 22 0 0;"
+            "-fx-background-color: " + bg + ";" +
+            "-fx-background-radius: 19 19 0 0;"
         );
 
-        Circle circle = new Circle(18);
-
-        circle.setFill(Color.WHITE);
-
+        StackPane iconBox = new StackPane();
+        Circle circle = new Circle(20);
+        circle.setFill(Color.web("rgba(255,255,255,0.22)"));
         Label iconLbl = new Label(icon);
+        iconLbl.setStyle("-fx-font-size: 17px;");
+        iconBox.getChildren().addAll(circle, iconLbl);
 
-        iconLbl.setStyle(
-                "-fx-font-size: 16px;"
-        );
-
-        StackPane iconBox = new StackPane(
-                circle,
-                iconLbl
-        );
-
+        String textColor = darkText ? DARK : "white";
         Label titleLbl = new Label(title);
-
         titleLbl.setStyle(
-                "-fx-font-size: 20px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: white;"
+            "-fx-font-size: 17px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-text-fill: " + textColor + ";" +
+            "-fx-letter-spacing: 1.5;"
         );
 
-        header.getChildren().addAll(
-                iconBox,
-                titleLbl
-        );
-
+        header.getChildren().addAll(iconBox, titleLbl);
         return header;
     }
 
-    // =========================================================
-    // ITEM COMIDA
-    // =========================================================
-
-    private static HBox buildFoodItem(
-            String number,
-            String title,
-            String price
-    ) {
-
-        HBox item = new HBox(10);
-
-        item.setAlignment(Pos.CENTER_LEFT);
-
-        item.setPadding(new Insets(8));
-
-        item.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-background-radius: 14;"
-        );
-
-        Circle image = new Circle(18);
-
-        image.setFill(Color.web("#D9D9D9"));
-
-        Label num = new Label(number);
-
-        num.setStyle(
-                "-fx-background-color: #FF6B00;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 10px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-padding: 4 7 4 7;" +
-                "-fx-background-radius: 50;"
-        );
-
-        Label titleLbl = new Label(title);
-
-        titleLbl.setStyle(
-                "-fx-font-size: 13px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #1A1A1A;"
-        );
-
-        Region spacer = new Region();
-
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        Label priceLbl = new Label(price);
-
-        priceLbl.setStyle(
-                "-fx-background-color: #FF6B00;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 11px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-padding: 6 10 6 10;" +
-                "-fx-background-radius: 8;"
-        );
-
-        item.getChildren().addAll(
-                image,
-                num,
-                titleLbl,
-                spacer,
-                priceLbl
-        );
-
-        return item;
+    // ─── Franja tricolor bajo el header ───────────────────────
+    private static HBox buildColorStripe(String c1, String c2, String c3) {
+        HBox stripe = new HBox();
+        stripe.setPrefHeight(5);
+        Region r1 = new Region(); r1.setStyle("-fx-background-color: " + c1 + ";");
+        Region r2 = new Region(); r2.setStyle("-fx-background-color: " + c2 + ";");
+        Region r3 = new Region(); r3.setStyle("-fx-background-color: " + c3 + ";");
+        HBox.setHgrow(r1, Priority.ALWAYS);
+        HBox.setHgrow(r2, Priority.ALWAYS);
+        HBox.setHgrow(r3, Priority.ALWAYS);
+        stripe.getChildren().addAll(r1, r2, r3);
+        return stripe;
     }
 
-    // =========================================================
-    // BEBIDA
-    // =========================================================
-
-    private static VBox buildDrinkCard(
-            String number,
-            String title,
-            String price
-    ) {
-
-        VBox card = new VBox(12);
-
-        card.setAlignment(Pos.CENTER);
-
-        card.setPadding(new Insets(15));
-
-        card.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-background-radius: 18;"
-        );
-
-        Circle image = new Circle(38);
-
-        image.setFill(Color.web("#DCC2FF"));
-
-        Label num = new Label(number);
-
-        num.setStyle(
-                "-fx-background-color: #6E2EBB;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 11px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-padding: 5 8 5 8;" +
-                "-fx-background-radius: 50;"
-        );
-
-        Label titleLbl = new Label(title);
-
-        titleLbl.setStyle(
-                "-fx-font-size: 16px;" +
-                "-fx-font-weight: bold;"
-        );
-
-        Label priceLbl = new Label(price);
-
-        priceLbl.setStyle(
-                "-fx-background-color: #6E2EBB;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 14px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-padding: 8 14 8 14;" +
-                "-fx-background-radius: 8;"
-        );
-
-        card.getChildren().addAll(
-                image,
-                num,
-                titleLbl,
-                priceLbl
-        );
-
-        return card;
-    }
-
-    // =========================================================
-    // PROMOS
-    // =========================================================
-
-    private static VBox buildPromoCard(
-            String number,
-            String title,
-            String combo,
-            String price
-    ) {
-
-        VBox card = new VBox(12);
-
-        card.setPadding(new Insets(15));
-
-        card.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-background-radius: 18;"
-        );
-
-        HBox top = new HBox(8);
-
-        Label num = new Label(number);
-
-        num.setStyle(
-                "-fx-background-color: #248A1D;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 11px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-padding: 5 8 5 8;" +
-                "-fx-background-radius: 50;"
-        );
-
-        VBox texts = new VBox(1);
-
-        Label titleLbl = new Label(title);
-
-        titleLbl.setStyle(
-                "-fx-font-size: 15px;" +
-                "-fx-font-weight: bold;"
-        );
-
-        Label comboLbl = new Label(combo);
-
-        comboLbl.setStyle(
-                "-fx-font-size: 12px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #248A1D;"
-        );
-
-        texts.getChildren().addAll(
-                titleLbl,
-                comboLbl
-        );
-
-        top.getChildren().addAll(
-                num,
-                texts
-        );
-
-        Label priceLbl = new Label(price);
-
-        priceLbl.setStyle(
-                "-fx-background-color: #248A1D;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 14px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-padding: 8 14 8 14;" +
-                "-fx-background-radius: 8;"
-        );
-
-        Circle image = new Circle(38);
-
-        image.setFill(Color.web("#FFD76A"));
-
-        VBox.setMargin(image, new Insets(0,0,0,35));
-
-        card.getChildren().addAll(
-                top,
-                priceLbl,
-                image
-        );
-
-        return card;
-    }
-
-    private static VBox buildCompactListSection(
-        String icon,
-        String title,
-        String color
-) {
-
-    VBox section = new VBox(10);
-
-    HBox header = new HBox(10);
-
-    header.setAlignment(Pos.CENTER_LEFT);
-
-    Label iconLbl = new Label(icon);
-
-    iconLbl.setStyle(
-            "-fx-font-size: 18px;"
-    );
-
-    Label titleLbl = new Label(title);
-
-    titleLbl.setStyle(
-            "-fx-font-size: 18px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-text-fill: " + color + ";"
-    );
-
-    Region line = new Region();
-
-    HBox.setHgrow(line, Priority.ALWAYS);
-
-    line.setPrefHeight(2);
-
-    line.setStyle(
-            "-fx-background-color: " + color + ";"
-    );
-
-    header.getChildren().addAll(
-            iconLbl,
-            titleLbl,
-            line
-    );
-
-    section.getChildren().add(header);
-
-    return section;
-}
-private static HBox buildCompactListItem(
-        String title,
-        String price
+    // ─── Fila plato ───────────────────────────────────────────
+   private static HBox buildFoodRow(
+    String num,
+    String title,
+    String price,
+    String accent,
+    String imagePath
 ) {
 
     HBox item = new HBox(10);
+item.setAlignment(Pos.CENTER_LEFT);
+item.setPadding(new Insets(8, 10, 8, 10));
+item.setStyle(
+    "-fx-background-color: " + ROW + ";" +
+    "-fx-background-radius: 12;" +
+    "-fx-cursor: hand;"
+);
 
-    item.setAlignment(Pos.CENTER_LEFT);
+    Image image = new Image(
+    MostrarMenu.class.getResourceAsStream(imagePath)
+);
+ImageView img = new ImageView(image);
 
-    item.setPadding(new Insets(10));
+img.setFitWidth(40);
+img.setFitHeight(40);
 
-    // MÁS PEQUEÑO
-    item.setPrefWidth(420);
+Circle clip = new Circle(20, 20, 20);
+img.setClip(clip);
 
-    item.setStyle(
-            "-fx-background-color: white;" +
-            "-fx-background-radius: 14;" +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05),6,0,0,2);"
+    Label numLbl = new Label(num);
+    numLbl.setMinWidth(22);
+    numLbl.setMinHeight(22);
+    numLbl.setAlignment(Pos.CENTER);
+    numLbl.setStyle(
+        "-fx-background-color: " + accent + ";" +
+        "-fx-text-fill: white;" +
+        "-fx-font-size: 10px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-background-radius: 50;" +
+        "-fx-padding: 4 5 4 5;"
     );
-
-    // Imagen
-    Circle image = new Circle(18);
-
-    image.setFill(Color.web("#D9D9D9"));
-
-    // Textos
-    VBox texts = new VBox(2);
 
     Label titleLbl = new Label(title);
-
     titleLbl.setStyle(
-            "-fx-font-size: 13px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-text-fill: #1A1A1A;"
+        "-fx-font-size: 13px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-text-fill: " + DARK + ";"
     );
 
-    Label stars = new Label("★★★★★");
+    // Hace que el nombre ocupe todo el espacio disponible
+    HBox.setHgrow(titleLbl, Priority.ALWAYS);
+    titleLbl.setMaxWidth(Double.MAX_VALUE);
 
-    stars.setStyle(
-            "-fx-text-fill: #FFB400;" +
-            "-fx-font-size: 10px;"
-    );
-
-    texts.getChildren().addAll(
-            titleLbl,
-            stars
-    );
-
-    Region spacer = new Region();
-
-    HBox.setHgrow(spacer, Priority.ALWAYS);
-
-    // Precio
     Label priceLbl = new Label(price);
+    priceLbl.setPrefWidth(70);      // ancho fijo
+    priceLbl.setAlignment(Pos.CENTER);
 
     priceLbl.setStyle(
-            "-fx-background-color: #FF6B00;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-size: 11px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-padding: 6 10 6 10;" +
-            "-fx-background-radius: 8;"
+        "-fx-background-color: " + accent + ";" +
+        "-fx-text-fill: white;" +
+        "-fx-font-size: 11px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-padding: 6 11 6 11;" +
+        "-fx-background-radius: 8;"
     );
 
     item.getChildren().addAll(
-            image,
-            texts,
-            spacer,
-            priceLbl
+        img,
+        numLbl,
+        titleLbl,
+        priceLbl
+    );
+    item.setOnMouseClicked(e -> {
+    mostrarIngredientes(
+        title,
+        imagePath,
+        price
+    );
+});
+    return item;
+}
+
+    // ─── Bebida card ──────────────────────────────────────────
+   private static VBox buildDrinkCard(
+    String num,
+    String title,
+    String price,
+    String imagePath
+) {
+        VBox card = new VBox(10);
+        card.setAlignment(Pos.CENTER);
+        card.setPadding(new Insets(18));
+        card.setStyle("-fx-background-color: " + ROW + "; -fx-background-radius: 16;");
+
+        Image image = new Image(
+    MostrarMenu.class.getResourceAsStream(imagePath)
+);
+
+ImageView img = new ImageView(image);
+
+img.setFitWidth(88);
+img.setFitHeight(88);
+
+Circle clip = new Circle(44, 44, 44);
+img.setClip(clip);
+
+        Label numLbl = new Label(num);
+        numLbl.setStyle(
+            "-fx-background-color: " + VERDE + ";" +
+            "-fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold;" +
+            "-fx-padding: 5 9 5 9; -fx-background-radius: 50;"
+        );
+
+        Label titleLbl = new Label(title);
+        titleLbl.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: " + DARK + ";");
+
+        Label priceLbl = new Label(price);
+        priceLbl.setStyle(
+            "-fx-background-color: " + VERDE + ";" +
+            "-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;" +
+            "-fx-padding: 8 16 8 16; -fx-background-radius: 10;"
+        );
+
+        card.getChildren().addAll(img, numLbl, titleLbl, priceLbl);
+        return card;
+    }
+
+    // ─── Promo card ───────────────────────────────────────────
+    private static VBox buildPromoCard(
+    String num,
+    String title,
+    String combo,
+    String price,
+    String imagePath
+) {
+        VBox card = new VBox(12);
+        card.setPadding(new Insets(14));
+        card.setStyle("-fx-background-color: " + ROW + "; -fx-background-radius: 16;");
+
+        HBox top = new HBox(10);
+        top.setAlignment(Pos.CENTER_LEFT);
+
+        Label numLbl = new Label(num);
+        numLbl.setStyle(
+            "-fx-background-color: " + VERDE + ";" +
+            "-fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold;" +
+            "-fx-padding: 5 9 5 9; -fx-background-radius: 50;"
+        );
+
+        VBox texts = new VBox(2);
+        Label titleLbl = new Label(title);
+        titleLbl.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: " + DARK + ";");
+        Label comboLbl = new Label(combo);
+        comboLbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: " + VERDE + ";");
+        texts.getChildren().addAll(titleLbl, comboLbl);
+
+        Region sp = new Region(); HBox.setHgrow(sp, Priority.ALWAYS);
+
+        Image image = new Image(
+    MostrarMenu.class.getResourceAsStream(imagePath)
+);
+
+ImageView img = new ImageView(image);
+
+img.setFitWidth(76);
+img.setFitHeight(76);
+
+Circle clip = new Circle(38, 38, 38);
+img.setClip(clip);
+
+        top.getChildren().addAll(numLbl, texts, sp, img);
+
+        Label priceLbl = new Label(price);
+        priceLbl.setMaxWidth(Double.MAX_VALUE);
+        priceLbl.setAlignment(Pos.CENTER);
+        priceLbl.setStyle(
+            "-fx-background-color: " + VERDE + ";" +
+            "-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;" +
+            "-fx-padding: 8 14 8 14; -fx-background-radius: 10;"
+        );
+
+        card.getChildren().addAll(top, priceLbl);
+        return card;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  LIST MODE
+    // ═══════════════════════════════════════════════════════════
+
+    private static VBox buildListSection(String icon, String title, String color, GridPane grid) {
+        VBox section = new VBox();
+        section.setStyle(
+            "-fx-background-color: " + CARD + ";" +
+            "-fx-background-radius: 20;" +
+            "-fx-border-color: " + color + ";" +
+            "-fx-border-width: 0 0 0 4;" +
+            "-fx-border-radius: 20;" +
+            "-fx-effect: dropshadow(gaussian, rgba(44,26,14,0.12), 14, 0, 0, 5);"
+        );
+
+        boolean darkText = color.equals(ORO);
+
+        HBox header = new HBox(12);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPadding(new Insets(13, 18, 13, 18));
+        header.setStyle(
+            "-fx-background-color: " + color + ";" +
+            "-fx-background-radius: 19 19 0 0;"
+        );
+
+        Label iconLbl = new Label(icon);
+        iconLbl.setStyle("-fx-font-size: 19px;");
+
+        String txtColor = darkText ? DARK : "white";
+        Label titleLbl = new Label(title);
+        titleLbl.setStyle(
+            "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: " + txtColor + "; -fx-letter-spacing: 1.5;"
+        );
+
+        Region sp = new Region(); HBox.setHgrow(sp, Priority.ALWAYS);
+
+        int count = grid.getChildren().size();
+        String countBg = darkText ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.22)";
+        Label countLbl = new Label(count + " items");
+        countLbl.setStyle(
+            "-fx-background-color: " + countBg + ";" +
+            "-fx-text-fill: " + txtColor + ";" +
+            "-fx-font-size: 11px; -fx-font-weight: bold;" +
+            "-fx-padding: 4 11 4 11; -fx-background-radius: 20;"
+        );
+
+        header.getChildren().addAll(iconLbl, titleLbl, sp, countLbl);
+
+        // Franja tricolor bajo el header
+        HBox stripe = buildColorStripe(VERDE, "white", ROJO);
+
+        VBox body = new VBox();
+        body.setPadding(new Insets(12));
+        body.getChildren().add(grid);
+
+        section.getChildren().addAll(header, stripe, body);
+        return section;
+    }
+
+    private static GridPane buildPlatosListGrid() {
+        GridPane g = makeListGrid();
+        String[][] data = {
+    {"Nachos Supremos","Bs 45","/images/nachos-supremos.jpg",ROJO},
+    {"MegaBurrito","Bs 45","/images/megaburrito.jpg",ROJO},
+    {"RamenBirria","Bs 35","/images/ramenbirria.jpg",ROJO},
+    {"Tacobirria","Bs 15","/images/tacobirria.jpg",ORO},
+    {"Quesabirria","Bs 15","/images/quesabirria.jpg",ORO},
+    {"Suadero","Bs 15","/images/suadero.jpg",ORO},
+    {"Pastor","Bs 15","/images/pastor.jpg",VERDE},
+    {"Lengua","Bs 15","/images/lengua.jpg",VERDE}
+};
+        for (int i = 0; i < data.length; i++) {
+            g.add(
+    buildListItem(
+        data[i][0],
+        data[i][1],
+        data[i][2],
+        data[i][3]
+    ),
+    i % 2,
+    i / 2
+);
+        }
+        return g;
+    }
+
+    private static GridPane buildBebidasListGrid() {
+        GridPane g = makeListGrid();
+        g.add(
+    buildListItem(
+        "Horchata",
+        "Bs 8",
+        "/images/horchata.jpg",
+        VERDE
+    ),
+    0,
+    0
+);
+
+g.add(
+    buildListItem(
+        "Jamaica",
+        "Bs 8",
+        "/images/jamaica.jpg",
+        VERDE
+    ),
+    1,
+    0
+);
+        return g;
+    }
+
+    private static GridPane buildPromosListGrid() {
+        GridPane g = makeListGrid();
+        g.add(
+    buildListItemPromo(
+        "Combo Nachos",
+        "COMBO 2",
+        "Bs 70",
+        "/images/nachos-supremos.jpg",
+        VERDE
+    ),
+    0,
+    0
+);
+
+g.add(
+    buildListItemPromo(
+        "Combo Burrito",
+        "COMBO 2",
+        "Bs 70",
+        "/images/megaburrito.jpg",
+        VERDE
+    ),
+    1,
+    0
+);
+        return g;
+    }
+
+    private static GridPane makeListGrid() {
+        GridPane g = new GridPane();
+        g.setHgap(10); g.setVgap(10);
+        ColumnConstraints cc = new ColumnConstraints();
+        cc.setPercentWidth(50);
+        ColumnConstraints cc2 = new ColumnConstraints();
+        cc2.setPercentWidth(50);
+        g.getColumnConstraints().addAll(cc, cc2);
+        return g;
+    }
+
+    private static HBox buildListItem(
+    String title,
+    String price,
+    String imagePath,
+    String accent
+) {
+        HBox item = new HBox(12);
+        item.setAlignment(Pos.CENTER_LEFT);
+        item.setPadding(new Insets(10, 12, 10, 12));
+        item.setStyle(
+            "-fx-background-color: " + ROW + ";" +
+            "-fx-background-radius: 12;" +
+            "-fx-effect: dropshadow(gaussian, rgba(44,26,14,0.06), 6, 0, 0, 2);"
+        );
+
+        Image image = new Image(
+    MostrarMenu.class.getResourceAsStream(imagePath)
+);
+
+ImageView img = new ImageView(image);
+
+img.setFitWidth(44);
+img.setFitHeight(44);
+
+Circle clip = new Circle(22,22,22);
+img.setClip(clip);
+
+        VBox texts = new VBox(3);
+        Label t = new Label(title);
+        t.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: " + DARK + ";");
+        Label s = new Label("★★★★★");
+        s.setStyle("-fx-text-fill: #D4A017; -fx-font-size: 11px;");
+        texts.getChildren().addAll(t, s);
+        HBox.setHgrow(texts, Priority.ALWAYS);
+
+        Label priceLbl = new Label(price);
+        priceLbl.setStyle(
+            "-fx-background-color: " + accent + ";" +
+            "-fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold;" +
+            "-fx-padding: 6 11 6 11; -fx-background-radius: 8;"
+        );
+
+        item.getChildren().addAll(img, texts, priceLbl);
+        return item;
+    }
+
+    private static HBox buildListItemPromo(
+    String title,
+    String badge,
+    String price,
+    String imagePath,
+    String accent
+){
+        HBox item = new HBox(12);
+        item.setAlignment(Pos.CENTER_LEFT);
+        item.setPadding(new Insets(10, 12, 10, 12));
+        item.setStyle(
+            "-fx-background-color: " + ROW + ";" +
+            "-fx-background-radius: 12;" +
+            "-fx-effect: dropshadow(gaussian, rgba(44,26,14,0.06), 6, 0, 0, 2);"
+        );
+
+        Image image = new Image(
+    MostrarMenu.class.getResourceAsStream(imagePath)
+);
+
+ImageView img = new ImageView(image);
+
+img.setFitWidth(44);
+img.setFitHeight(44);
+
+Circle clip = new Circle(22,22,22);
+img.setClip(clip);
+
+        VBox texts = new VBox(3);
+        Label t = new Label(title);
+        t.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: " + DARK + ";");
+        Label b = new Label(badge);
+        b.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: " + accent + ";");
+        texts.getChildren().addAll(t, b);
+        HBox.setHgrow(texts, Priority.ALWAYS);
+
+        Label priceLbl = new Label(price);
+        priceLbl.setStyle(
+            "-fx-background-color: " + accent + ";" +
+            "-fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold;" +
+            "-fx-padding: 6 11 6 11; -fx-background-radius: 8;"
+        );
+
+        item.getChildren().addAll(img, texts, priceLbl);
+        return item;
+    }
+
+    // ─── Botones de toggle ────────────────────────────────────
+    private static void styleToggle(Button btn, boolean active) {
+        if (active) {
+            btn.setStyle(
+                "-fx-background-color: " + ROJO + ";" +
+                "-fx-text-fill: white;" +
+                "-fx-font-size: 18px; -fx-font-weight: bold;" +
+                "-fx-background-radius: 10; -fx-cursor: hand;" +
+                "-fx-padding: 8 14 8 14;"
+            );
+        } else {
+            btn.setStyle(
+                "-fx-background-color: white;" +
+                "-fx-text-fill: #7A5C3A;" +
+                "-fx-font-size: 18px; -fx-font-weight: bold;" +
+                "-fx-background-radius: 10;" +
+                "-fx-border-color: #D5C4A8;" +
+                "-fx-border-radius: 10; -fx-border-width: 1.5;" +
+                "-fx-cursor: hand; -fx-padding: 8 14 8 14;"
+            );
+        }
+    }
+    private static void mostrarIngredientes(
+        String plato,
+        String imagen,
+        String precio
+) {
+
+    Stage ventana = new Stage();
+    ventana.initModality(Modality.APPLICATION_MODAL);
+    ventana.setTitle(plato);
+
+    String ingredientes = "";
+    String descripcion = "";
+
+    switch (plato) {
+
+        case "Tacobirria":
+            descripcion =
+                "Taco tradicional relleno de birria jugosa y queso fundido.";
+
+            ingredientes =
+                "• Tortilla de maíz\n" +
+                "• Birria de res\n" +
+                "• Queso mozzarella\n" +
+                "• Cilantro\n" +
+                "• Cebolla";
+            break;
+
+        case "Quesabirria":
+            descripcion =
+                "Tortilla dorada con abundante queso y birria.";
+
+            ingredientes =
+                "• Tortilla\n" +
+                "• Birria\n" +
+                "• Queso\n" +
+                "• Cilantro\n" +
+                "• Cebolla";
+            break;
+    }
+
+    VBox root = new VBox(15);
+    root.setPadding(new Insets(20));
+    root.setAlignment(Pos.TOP_CENTER);
+
+    root.setStyle(
+        "-fx-background-color: #F5EDD8;"
     );
 
-    return item;
+    Label titulo = new Label(plato);
+
+    titulo.setStyle(
+        "-fx-font-size: 24px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-text-fill: #C8102E;"
+    );
+
+    ImageView img = new ImageView(
+        new Image(
+            MostrarMenu.class.getResourceAsStream(imagen)
+        )
+    );
+
+    img.setFitWidth(250);
+    img.setFitHeight(180);
+    img.setPreserveRatio(true);
+
+    Label desc = new Label(descripcion);
+
+    desc.setWrapText(true);
+    desc.setMaxWidth(300);
+
+    Label ing = new Label(ingredientes);
+
+    ing.setStyle(
+        "-fx-font-size: 14px;"
+    );
+
+    Label price = new Label(
+        "Precio: " + precio
+    );
+
+    price.setStyle(
+        "-fx-font-size: 18px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-text-fill: #1A6B3C;"
+    );
+
+    Button cerrar = new Button("Cerrar");
+
+    cerrar.setStyle(
+        "-fx-background-color: #C8102E;" +
+        "-fx-text-fill: white;" +
+        "-fx-font-weight: bold;" +
+        "-fx-background-radius: 10;"
+    );
+
+    cerrar.setOnAction(e -> ventana.close());
+
+    root.getChildren().addAll(
+        titulo,
+        img,
+        desc,
+        ing,
+        price,
+        cerrar
+    );
+
+    Scene scene = new Scene(root, 500, 650);
+
+    ventana.setScene(scene);
+    ventana.showAndWait();
 }
 }
