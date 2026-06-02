@@ -18,7 +18,7 @@ import com.dhery.views.HistorialVentasView;
 import com.dhery.views.ClientesRegistradosView;
 import com.dhery.views.FacturasGuardadasView;
 import com.dhery.views.MisPedidosView;
-import com.dhery.views.MisDatosView;
+import com.dhery.views.MostrarMenuCajera;
 import com.dhery.views.EditarDatosView;
 
 
@@ -133,6 +133,9 @@ public static void goMisDatosEdit(user currentUser) {
     stage.setScene(EditarDatosView.getScene(currentUser));
     stage.setTitle("Tacabrón - Editar Mis Datos");
 }
-    
+ public static void goMostrarMenuCajera(){
+        stage.setScene(MostrarMenuCajera.getScene(currentUser));
+        stage.setTitle("Tacabrón - Menú");
+    }
 
 }

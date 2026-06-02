@@ -173,6 +173,8 @@ public class MenuCajeroView {
     card.setOnMouseClicked(e -> Router.goClientesRegistradosView(currentUser));
     } else if (title.equals("FACTURAS GUARDADAS")) {
     card.setOnMouseClicked(e -> Router.goFacturasGuardadasView());
+    }else if (title.equals("VER MENÚ")){
+    card.setOnMouseClicked(e -> Router.goMostrarMenuCajera());
     }
 
     // ── Ícono con fondo circular ──

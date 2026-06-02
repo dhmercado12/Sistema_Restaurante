@@ -14,8 +14,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.image.ImageView;
 
-public class MostrarMenu {
-
+public class MostrarMenuCajera{
+private static com.dhery.models.user currentUser;
     // ═══════════════════════════════════════════════════════════
     //  PALETA  BOLIVIA × MÉXICO
     //  
@@ -30,7 +30,9 @@ public class MostrarMenu {
 
     private static boolean isGridMode = true;
 
-    public static Scene getScene() {
+    public static Scene getScene(com.dhery.models.user user) {
+
+    currentUser = user;
 
         VBox container = new VBox(14);
         container.setPadding(new Insets(16));
@@ -50,7 +52,7 @@ public class MostrarMenu {
             "-fx-cursor: hand;" +
             "-fx-padding: 9 18 9 18;"
         );
-        backBtn.setOnAction(e -> Router.goMenuClienteView());
+        backBtn.setOnAction(e -> Router.goMenuCajeroView(currentUser));
 
         Label menuTitle = new Label("MENÚ TACABRON");
 menuTitle.setStyle(
