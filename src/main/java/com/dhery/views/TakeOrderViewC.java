@@ -456,16 +456,8 @@ public class TakeOrderViewC {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button btnStatus = new Button("📋  ESTADO DE PEDIDO");
-        btnStatus.setPrefHeight(44);
-        btnStatus.setPrefWidth(220);
-        btnStatus.setStyle(
-            "-fx-background-color: " + ORANGE + "; -fx-text-fill: white;" +
-            " -fx-font-weight: bold; -fx-font-size: 13px;" +
-            " -fx-background-radius: 8; -fx-cursor: hand;");
-        btnStatus.setOnAction(e -> Router.goOrderStatusView());
 
-        hb.getChildren().addAll(btnBack, spacer, btnStatus);
+        hb.getChildren().addAll(btnBack);
         return hb;
     }
 
@@ -675,11 +667,18 @@ public class TakeOrderViewC {
             " -fx-background-radius: 8; -fx-cursor: hand;");
             confirm.setOnAction(e -> {
 
-            generarFactura(); // 🔥 muestra factura
-         guardarFactura();
-         orderItems.clear(); // limpia carrito
+    if (orderItems.isEmpty()) {
 
-         refreshTotals();    // reinicia totales
+        Alert alerta = new Alert(Alert.AlertType.WARNING);
+        alerta.setTitle("Pedido vacío");
+        alerta.setHeaderText(null);
+        alerta.setContentText("Debe agregar al menos un producto antes de confirmar el pedido.");
+        alerta.showAndWait();
+
+        return;
+    }
+
+    generarFactura();
 });
 
         Button cancel = new Button("✖  CANCELAR");
@@ -769,27 +768,53 @@ public class TakeOrderViewC {
             "-fx-text-fill: #2E7D32;"
     );
 
-    Label gracias = new Label("¡Gracias por su compra en Tacabrón!");
+    Label gracias = new Label("Por favor verifique que el pedido sea correcto\n" +
+            "Si esta seguro(a) presione CONFIRMAR PEDIDO");
     gracias.setStyle("-fx-font-size: 12px; -fx-text-fill: #555;");
 
-    Button btnCerrar = new Button("Cerrar");
-    btnCerrar.setStyle("-fx-background-color: #CC0000; -fx-text-fill: white;");
-    btnCerrar.setOnAction(e -> facturaStage.close());
+    Button btnConfirmarCompra = new Button("CONFIRMAR COMPRA");
 
-    root.getChildren().addAll(
-            title,
-            subtitle,
-            sep1,
-            cliente,
-            direccion,
-            celular,
-            sep2,
-            itemsBox,
-            sep3,
-            totalLblFinal,
-            gracias,
-            btnCerrar
+btnConfirmarCompra.setStyle(
+        "-fx-background-color: #2E7D32;" +
+        "-fx-text-fill: white;" +
+        "-fx-font-weight: bold;" +
+        "-fx-font-size: 13px;"
+);
+btnConfirmarCompra.setOnAction(e -> {
+
+    guardarFactura();
+
+    Alert exito = new Alert(Alert.AlertType.INFORMATION);
+
+    exito.setTitle("Pedido realizado");
+    exito.setHeaderText("¡Gracias por su compra!");
+
+    exito.setContentText(
+            "Su pedido fue registrado correctamente.\n\n" +
+            "Tacabrón agradece su preferencia 🌮"
     );
+
+    exito.showAndWait();
+
+    orderItems.clear();
+    refreshTotals();
+
+    facturaStage.close();
+});
+    root.getChildren().addAll(
+        title,
+        subtitle,
+        sep1,
+        cliente,
+        direccion,
+        celular,
+        sep2,
+        itemsBox,
+        sep3,
+        totalLblFinal,
+        gracias,
+        btnConfirmarCompra
+);
 
     Scene scene = new Scene(root, 350, 500);
     facturaStage.setTitle("Factura Tacabrón");

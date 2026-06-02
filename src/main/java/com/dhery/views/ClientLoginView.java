@@ -215,7 +215,7 @@ title.setTextAlignment(TextAlignment.CENTER);
         
     if (user.getRol().equals("ADMIN")) {
 
-        Router.goMenuCajeroView();
+        Router.goMenuCajeroView(user);
 
     } else {
 

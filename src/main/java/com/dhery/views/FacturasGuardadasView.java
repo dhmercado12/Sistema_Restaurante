@@ -1,6 +1,8 @@
 package com.dhery.views;
 
 import com.dhery.app.Router;
+import com.dhery.models.user;
+
 import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.geometry.*;
@@ -21,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FacturasGuardadasView {
-
+private static user currentUser;
     // ── Modelo ────────────────────────────────────────────────────────────────
     public static class Factura {
         private final IntegerProperty numero    = new SimpleIntegerProperty();
@@ -62,8 +64,8 @@ public class FacturasGuardadasView {
     private static Label lblTotal;
 
     @SuppressWarnings("unchecked")
-    public static Scene getScene() {
-        currentPage      = 0;
+    public static Scene getScene(user user) {
+    currentUser = user;
         allFacturas      = loadFacturas();
         filteredFacturas = FXCollections.observableArrayList(allFacturas);
         pageFacturas     = FXCollections.observableArrayList();
@@ -146,7 +148,7 @@ public class FacturasGuardadasView {
         HBox bottom = new HBox();
         bottom.setPadding(new Insets(12, 28, 16, 28));
         Button btnBack = redOutlineButton("← ATRÁS");
-        btnBack.setOnAction(e -> Router.goMenuCajeroView());
+        btnBack.setOnAction(e -> Router.goMenuCajeroView(currentUser));
         bottom.getChildren().add(btnBack);
 
         root.getChildren().addAll(header, searchBar, table, pagRow, bottom);

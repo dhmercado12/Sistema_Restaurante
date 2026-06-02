@@ -1,6 +1,8 @@
 package com.dhery.views;
 
 import com.dhery.app.Router;
+import com.dhery.models.user;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,7 +15,11 @@ import javafx.scene.text.TextAlignment;
 
 public class MenuCajeroView {
 
-    public static Scene getScene() {
+    private static user currentUser;
+
+    public static Scene getScene(user user) {
+
+        currentUser = user;
 
         // ── ROOT ──────────────────────────────────────────────────────────────
         StackPane root = new StackPane();
@@ -160,11 +166,11 @@ public class MenuCajeroView {
     if (title.equals("STOCK")) {
         card.setOnMouseClicked(e -> Router.goStockView());
     } else if (title.equals("TOMAR EL PEDIDO")) {
-        card.setOnMouseClicked(e -> Router.goTakeOrderView());
+        card.setOnMouseClicked(e -> Router.goTakeOrderView(currentUser));
     } else if (title.equals("HISTORIAL DE VENTAS")) {
     card.setOnMouseClicked(e -> Router.goHistorialVentasView());
     } else if (title.equals("CLIENTES REGISTRADOS")) {
-    card.setOnMouseClicked(e -> Router.goClientesRegistradosView());
+    card.setOnMouseClicked(e -> Router.goClientesRegistradosView(currentUser));
     } else if (title.equals("FACTURAS GUARDADAS")) {
     card.setOnMouseClicked(e -> Router.goFacturasGuardadasView());
     }

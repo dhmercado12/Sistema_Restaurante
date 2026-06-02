@@ -1,6 +1,8 @@
 package com.dhery.views;
 
 import com.dhery.app.Router;
+import com.dhery.models.user;
+
 import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.geometry.*;
@@ -10,7 +12,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 public class StockView {
-
+private static user currentUser;
     // ── Modelo ────────────────────────────────────────────────────────────────
     public static class Ingrediente {
         private final IntegerProperty numero   = new SimpleIntegerProperty();
@@ -46,7 +48,8 @@ public class StockView {
     private static final String TEXT_G   = "#AAAAAA";
     private static final String CAT_BG   = "#F5B700";
 
-    public static Scene getScene() {
+    public static Scene getScene(user user) {
+    currentUser = user;
         ObservableList<Ingrediente> stockData = buildStockData();
 
         HBox root = new HBox(0);
@@ -208,7 +211,7 @@ public class StockView {
         btnBack.setPrefWidth(120);
         btnBack.setStyle("-fx-background-color: " + ORANGE + "; -fx-text-fill: white;" +
             " -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-radius: 8; -fx-cursor: hand;");
-        btnBack.setOnAction(e -> Router.goMenuCajeroView());
+        btnBack.setOnAction(e -> Router.goMenuCajeroView(currentUser));
         bottom.getChildren().add(btnBack);
 
         panel.getChildren().addAll(header, table, bottom);

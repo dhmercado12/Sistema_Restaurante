@@ -68,13 +68,13 @@ public static void goRegisterView() {
         stage.setTitle("Tacabrón - Registro");
     }
     
-public static void goMenuCajeroView() {
-    stage.setScene(MenuCajeroView.getScene());
+public static void goMenuCajeroView(user user) {
+    stage.setScene(MenuCajeroView.getScene(user));
     stage.setTitle("Tacabrón - Menú Cajero");
 }
 
-public static void goTakeOrderView() {
-    stage.setScene(TakeOrderView.getScene());
+public static void goTakeOrderView(user user) {
+    stage.setScene(TakeOrderView.getScene(user));
     stage.setTitle("Tacabrón - Tomar Pedido");
 }
 
@@ -84,14 +84,11 @@ public static void goTakeOrderViewC(com.dhery.models.user user) {
 }
 
 public static void goStockView() {
-    stage.setScene(StockView.getScene());
+    stage.setScene(StockView.getScene(currentUser));
     stage.setTitle("Tacabrón - Stock");
 }
 
-public static void goOrderStatusView() {
-        stage.setScene(MenuCajeroView.getScene());
-        stage.setTitle("Tacabrón - Estado de Pedido");
-    }
+
 
     public static void goMenuClienteView() {
         stage.setScene(MenuClienteView.getScene(currentUser));
@@ -110,17 +107,17 @@ public static void goOrderStatusView() {
 
     //----PANTALLA DE HISTORIAL DE VENTAS ----  
     public static void goHistorialVentasView() {
-        stage.setScene(HistorialVentasView.getScene());
+        stage.setScene(HistorialVentasView.getScene(currentUser));
         stage.setTitle("Tacabrón - Historial de Ventas");
     }
     //-----PANTALLA DE CLIENTES REGISTRADOS-----
-    public static void goClientesRegistradosView() {
-        stage.setScene(ClientesRegistradosView.getScene());
-        stage.setTitle("Tacabrón - Clientes Registrados");
-    }
+    public static void goClientesRegistradosView(user user) {
+    stage.setScene(ClientesRegistradosView.getScene(user));
+    stage.setTitle("Tacabrón - Clientes Registrados");
+}
     //-----PANTALLA DE FACTURAS GUARDADAS-----
     public static void goFacturasGuardadasView() {
-        stage.setScene(FacturasGuardadasView.getScene());
+        stage.setScene(FacturasGuardadasView.getScene(currentUser));
         stage.setTitle("Tacabrón - Facturas Guardadas");
     }
     public static void goMisFacturas() {

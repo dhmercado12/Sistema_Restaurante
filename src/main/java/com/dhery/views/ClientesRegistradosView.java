@@ -14,6 +14,7 @@ import com.dhery.repositories.UserRepository;
 import com.dhery.views.ClientesRegistradosView.Cliente;
 
 public class ClientesRegistradosView {
+    private static user currentUser;
 
     // ── Modelo ────────────────────────────────────────────────────────────────
     public static class Cliente {
@@ -47,8 +48,8 @@ public class ClientesRegistradosView {
     private static Label lblTotal;
 
     @SuppressWarnings("unchecked")
-    public static Scene getScene() {
-        currentPage    = 0;
+    public static Scene getScene(user user) {
+    currentUser = user;
         UserRepository repo = new UserRepository();
 
 allClientes = FXCollections.observableArrayList(
@@ -142,7 +143,7 @@ allClientes = FXCollections.observableArrayList(
         HBox bottom = new HBox();
         bottom.setPadding(new Insets(12, 28, 16, 28));
         Button btnBack = redOutlineButton("← ATRÁS");
-        btnBack.setOnAction(e -> Router.goMenuCajeroView());
+        btnBack.setOnAction(e -> Router.goMenuCajeroView(currentUser));
         bottom.getChildren().add(btnBack);
 
         root.getChildren().addAll(header, searchBar, table, pagRow, bottom);

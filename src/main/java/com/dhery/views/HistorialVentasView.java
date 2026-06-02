@@ -1,6 +1,8 @@
 package com.dhery.views;
 
 import com.dhery.app.Router;
+import com.dhery.models.user;
+
 import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.geometry.*;
@@ -18,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class HistorialVentasView {
-
+private static user currentUser;
     // ── Modelo de Venta ───────────────────────────────────────────────────────
     public static class Venta {
         private final IntegerProperty numero   = new SimpleIntegerProperty();
@@ -74,8 +76,8 @@ public class HistorialVentasView {
     private static HBox paginacionBox;
 
     @SuppressWarnings("unchecked")
-    public static Scene getScene() {
-        currentPage = 0;
+    public static Scene getScene(user user) {
+    currentUser = user;
         allVentas      = buildSampleVentas();
         filteredVentas = FXCollections.observableArrayList(allVentas);
         pageVentas     = FXCollections.observableArrayList();
@@ -131,7 +133,7 @@ public class HistorialVentasView {
         HBox bottom = new HBox();
         bottom.setPadding(new Insets(12, 28, 16, 28));
         Button btnBack = redOutlineButton("← ATRÁS");
-        btnBack.setOnAction(e -> Router.goMenuCajeroView());
+        btnBack.setOnAction(e -> Router.goMenuCajeroView(currentUser));
         bottom.getChildren().add(btnBack);
 
         panel.getChildren().addAll(header, table, paginacionArea, bottom);
