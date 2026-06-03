@@ -20,7 +20,8 @@ import com.dhery.views.FacturasGuardadasView;
 import com.dhery.views.MisPedidosView;
 import com.dhery.views.MostrarMenuCajera;
 import com.dhery.views.EditarDatosView;
-
+import com.dhery.views.EstadoCocinaView;
+import com.dhery.views.ControlDeliveryView;
 
 
 public class Router {
@@ -136,6 +137,14 @@ public static void goMisDatosEdit(user currentUser) {
  public static void goMostrarMenuCajera(){
         stage.setScene(MostrarMenuCajera.getScene(currentUser));
         stage.setTitle("Tacabrón - Menú");
+    }
+public static void goEstadoCocinaView() {
+        stage.setScene(EstadoCocinaView.getScene(currentUser));
+        stage.setTitle("Tacabron - Estado de Cocina");
+    }
+    public static void goControlDeliveryView() {
+        stage.setScene(ControlDeliveryView.getScene(currentUser));
+        stage.setTitle("Tacabron - Control de Delivery");
     }
 
 }

@@ -63,18 +63,114 @@ public class MenuCajeroView {
         Label bell = new Label("🔔");
         bell.setStyle("-fx-font-size: 17px;");
 
+        // Badge con contador reactivo
         StackPane badge = new StackPane();
         badge.setTranslateX(12);
         badge.setTranslateY(-12);
-        Circle badgeCircle = new Circle(7);
+        Circle badgeCircle = new Circle(8);
         badgeCircle.setFill(Color.web("#CC0000"));
-        Label badgeNum = new Label("1");
+        Label badgeNum = new Label("0");
         badgeNum.setStyle("-fx-font-size: 9px; -fx-text-fill: white; -fx-font-weight: bold;");
         badge.getChildren().addAll(badgeCircle, badgeNum);
 
+        // Actualizar badge con notificaciones no leídas
+        com.dhery.app.AppState.notificaciones.addListener(
+            (javafx.collections.ListChangeListener<com.dhery.app.AppState.Notificacion>) c -> {
+                long noLeidas = com.dhery.app.AppState.notificaciones.stream()
+                    .filter(n -> !n.leida).count();
+                badgeNum.setText(String.valueOf(noLeidas));
+                badge.setVisible(noLeidas > 0);
+            });
+        long noLeidas = com.dhery.app.AppState.notificaciones.stream()
+            .filter(n -> !n.leida).count();
+        badgeNum.setText(String.valueOf(noLeidas));
+        badge.setVisible(noLeidas > 0);
+
         stack.getChildren().addAll(circle, bell, badge);
         stack.setMaxSize(52, 52);
+        stack.setStyle("-fx-cursor: hand;");
+
+        // Popup de notificaciones
+        stack.setOnMouseClicked(e -> mostrarPopupNotificaciones(stack));
         return stack;
+    }
+
+    private static void mostrarPopupNotificaciones(javafx.scene.Node anchor) {
+        javafx.stage.Popup popup = new javafx.stage.Popup();
+        popup.setAutoHide(true);
+
+        javafx.scene.layout.VBox container = new javafx.scene.layout.VBox(0);
+        container.setPrefWidth(340);
+        container.setMaxHeight(400);
+        container.setStyle("-fx-background-color: white; -fx-border-color: #DDDDDD;" +
+            "-fx-border-radius: 12; -fx-background-radius: 12;" +
+            "-fx-effect: dropshadow(gaussian,rgba(0,0,0,0.18),16,0,0,4);");
+
+        // Encabezado del popup
+        javafx.scene.layout.HBox header = new javafx.scene.layout.HBox(10);
+        header.setPadding(new javafx.geometry.Insets(14, 16, 12, 16));
+        header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        header.setStyle("-fx-background-color: #CC0000; -fx-background-radius: 12 12 0 0;");
+        Label hTitle = new Label("🔔  NOTIFICACIONES");
+        hTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;");
+        javafx.scene.layout.Region sp = new javafx.scene.layout.Region();
+        javafx.scene.layout.HBox.setHgrow(sp, javafx.scene.layout.Priority.ALWAYS);
+        Button btnLimpiar = new Button("Limpiar");
+        btnLimpiar.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white;" +
+            "-fx-font-size: 11px; -fx-cursor: hand; -fx-background-radius: 6;");
+        btnLimpiar.setOnAction(ev -> {
+            com.dhery.app.AppState.notificaciones.forEach(n -> n.leida = true);
+            popup.hide();
+        });
+        header.getChildren().addAll(hTitle, sp, btnLimpiar);
+
+        // Lista de notificaciones
+        javafx.scene.layout.VBox lista = new javafx.scene.layout.VBox(0);
+        javafx.scene.control.ScrollPane scroll = new javafx.scene.control.ScrollPane(lista);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: white;");
+        scroll.setPrefHeight(300);
+
+        if (com.dhery.app.AppState.notificaciones.isEmpty()) {
+            Label empty = new Label("No hay notificaciones");
+            empty.setStyle("-fx-text-fill: #999; -fx-font-size: 13px; -fx-padding: 20;");
+            lista.getChildren().add(empty);
+        } else {
+            int i = 0;
+            for (com.dhery.app.AppState.Notificacion n : com.dhery.app.AppState.notificaciones) {
+                javafx.scene.layout.HBox row = new javafx.scene.layout.HBox(10);
+                row.setPadding(new javafx.geometry.Insets(10, 14, 10, 14));
+                row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                row.setStyle("-fx-background-color: " + (n.leida ? "white" : "#FFF5F5") + ";" +
+                    "-fx-border-color: transparent transparent #F0F0F0 transparent; -fx-border-width: 1;");
+
+                String ico = n.tipo.equals("STOCK_BAJO") ? "⚠️" :
+                             n.tipo.equals("PEDIDO_LISTO") ? "✅" : "📦";
+                Label icoLbl = new Label(ico);
+                icoLbl.setStyle("-fx-font-size: 16px;");
+
+                javafx.scene.layout.VBox textBox = new javafx.scene.layout.VBox(2);
+                Label msgLbl = new Label(n.mensaje);
+                msgLbl.setStyle("-fx-font-size: 12px; -fx-text-fill: #1A1A1A;");
+                msgLbl.setWrapText(true);
+                Label horaLbl = new Label(n.hora);
+                horaLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
+                textBox.getChildren().addAll(msgLbl, horaLbl);
+
+                n.leida = true;
+                row.getChildren().addAll(icoLbl, textBox);
+                lista.getChildren().add(row);
+                if (i++ >= 20) break;
+            }
+        }
+
+        container.getChildren().addAll(header, scroll);
+
+        popup.getContent().add(container);
+        javafx.geometry.Bounds bounds = anchor.localToScreen(anchor.getBoundsInLocal());
+        popup.show(anchor.getScene().getWindow(),
+            bounds.getMaxX() - 340,
+            bounds.getMaxY() + 8);
     }
 
     private static VBox buildTitleBox() {
@@ -124,7 +220,7 @@ public class MenuCajeroView {
             {"📄", "FACTURAS GUARDADAS",    "Consultar facturas\nguardadas"},
             {"👥", "CLIENTES REGISTRADOS",  "Ver lista de clientes\ny registrar nuevos"},
             {"📦", "STOCK",                 "Ver y administrar\ninventario de productos"},
-            {"⚙️", "PANEL DE CONTROL",      "Configuración y ajustes\ndel sistema"},
+            {"🛵", "CONTROL DE DELIVERY",    "Gestionar entregas\ny repartidores"},
             {"🍳", "VER ESTADO DE COCINA",  "Monitorear pedidos\nen preparación"},
         };
 
@@ -173,8 +269,12 @@ public class MenuCajeroView {
     card.setOnMouseClicked(e -> Router.goClientesRegistradosView(currentUser));
     } else if (title.equals("FACTURAS GUARDADAS")) {
     card.setOnMouseClicked(e -> Router.goFacturasGuardadasView());
-    }else if (title.equals("VER MENÚ")){
+    } else if (title.equals("VER MENÚ")){
     card.setOnMouseClicked(e -> Router.goMostrarMenuCajera());
+    } else if (title.equals("VER ESTADO DE COCINA")){
+    card.setOnMouseClicked(e -> Router.goEstadoCocinaView());
+    } else if (title.equals("CONTROL DE DELIVERY")){
+    card.setOnMouseClicked(e -> Router.goControlDeliveryView());
     }
 
     // ── Ícono con fondo circular ──
