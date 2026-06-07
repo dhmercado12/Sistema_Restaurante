@@ -109,21 +109,7 @@ public class SuggestionView {
         );
 
         btnBack.setOnAction(e -> Router.goMenuClienteView());
-
-        // Notificación
-        StackPane notif = new StackPane();
-
-        Circle circle = new Circle(24);
-        circle.setFill(Color.WHITE);
-        circle.setStroke(Color.web("#EEEEEE"));
-
-        Label bell = new Label("🔔");
-        bell.setStyle("-fx-font-size: 16px;");
-
-        notif.getChildren().addAll(circle, bell);
-
         topBar.setLeft(btnBack);
-        topBar.setRight(notif);
 
         return topBar;
     }
@@ -318,14 +304,31 @@ public class SuggestionView {
         );
 
         TextArea txtSuggestion = new TextArea();
+        Label contador = new Label("0 / 300");
+
+contador.setStyle(
+    "-fx-font-size: 11px;" +
+    "-fx-text-fill: #888888;"
+);
+
+txtSuggestion.textProperty().addListener((obs, oldV, newV) -> {
+    contador.setText(newV.length() + " / 300");
+});
 
         txtSuggestion.setPromptText(
             "Escribe aquí tu sugerencia..."
         );
 
+
         txtSuggestion.setWrapText(true);
 
         txtSuggestion.setPrefHeight(160);
+        txtSuggestion.textProperty().addListener((obs, oldV, newV) -> {
+
+    if (newV.length() > 300) {
+        txtSuggestion.setText(oldV);
+    }
+});
 
         txtSuggestion.setStyle(
             "-fx-background-radius: 16;" +
@@ -337,9 +340,10 @@ public class SuggestionView {
         );
 
         areaBox.getChildren().addAll(
-            areaLbl,
-            txtSuggestion
-        );
+    areaLbl,
+    txtSuggestion,
+    contador
+);
         
         // Botón enviar
         Button btnSend = new Button("✈ ENVIAR SUGERENCIA");
@@ -387,6 +391,22 @@ public class SuggestionView {
 
         return;
     }
+    String sugerencia = txtSuggestion.getText().trim();
+
+if (sugerencia.length() < 10) {
+
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+
+    alert.setHeaderText(null);
+
+    alert.setContentText(
+        "La sugerencia debe tener al menos 10 caracteres."
+    );
+
+    alert.showAndWait();
+
+    return;
+}
 
     SuggestionRepository.guardar(
 

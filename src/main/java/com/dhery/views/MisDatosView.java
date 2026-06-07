@@ -76,38 +76,22 @@ public class MisDatosView {
         );
         cardHeader.setAlignment(Pos.TOP_LEFT);
 
-        VBox headerText = new VBox(4);
+        VBox headerText = new VBox(6);
         headerText.setAlignment(Pos.TOP_LEFT);
+        headerText.setTranslateY(10);
         Label hTitle = new Label("Mi perfil");
-        hTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;");
-        Label hSub = new Label("Información de tu cuenta en Tacabrón");
-        hSub.setStyle("-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.75);");
+        hTitle.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: white;");
+        Label hSub = new Label(
+        "Información de tu cuenta en Tacabrón");
+        hSub.setStyle("-fx-font-size: 15px; -fx-text-fill: rgba(255,255,255,0.75);");
         headerText.getChildren().addAll(hTitle, hSub);
         cardHeader.getChildren().add(headerText);
 
-        // ── AVATAR flotante sobre el header ──────
-        String inicial = (currentUser.getUsername() != null && !currentUser.getUsername().isEmpty())
-            ? currentUser.getUsername().substring(0, 1).toUpperCase() : "U";
-
-        StackPane avatar = new StackPane();
-        avatar.setMaxSize(88, 88);
-        avatar.setMinSize(88, 88);
-        Circle avatarBorder = new Circle(44);
-        avatarBorder.setFill(Color.web(CARD_BG));
-        Circle avatarBg = new Circle(40);
-        avatarBg.setFill(Color.web(RED_BG));
-        Label avatarLbl = new Label(inicial);
-        avatarLbl.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: " + RED + ";");
-        avatar.getChildren().addAll(avatarBorder, avatarBg, avatarLbl);
-
-        // Wrapper que da el efecto de "flotar" sobre el header
-        HBox avatarRow = new HBox();
-        avatarRow.setPadding(new Insets(0, 0, 0, 32));
-        avatarRow.getChildren().add(avatar);
+        
 
         // ── CARD BODY ────────────────────────────
         VBox cardBody = new VBox(0);
-        cardBody.setPadding(new Insets(16, 32, 32, 32));
+        cardBody.setPadding(new Insets(25, 32, 32, 32));
 
         // Nombre + rol + botón editar
         HBox nameRow = new HBox();
@@ -179,13 +163,8 @@ public class MisDatosView {
 
         cardBody.getChildren().addAll(nameRow, sec1, gridDatos, sec2, statsRow);
 
-        // Ensamblar card con offset visual del avatar
-        // Usamos un StackPane para superponer el avatar sobre el borde header/body
         StackPane headerStack = new StackPane();
-        headerStack.setAlignment(Pos.BOTTOM_LEFT);
-        headerStack.getChildren().addAll(cardHeader, avatarRow);
-        // Empujar avatar hacia abajo para que quede mitad en header, mitad fuera
-        StackPane.setMargin(avatarRow, new Insets(0, 0, -44, 0));
+         headerStack.getChildren().add(cardHeader);
 
         card.getChildren().addAll(headerStack, cardBody);
 

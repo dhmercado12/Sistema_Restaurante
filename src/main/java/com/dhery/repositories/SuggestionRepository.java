@@ -9,7 +9,7 @@ import java.util.List;
 public class SuggestionRepository {
 
     private static final String FILE =
-            "sugerencias.txt";
+             "src/main/java/com/dhery/GestorArchivo/sugerencias.txt";
 
     public static void guardar(Suggestion s) {
 

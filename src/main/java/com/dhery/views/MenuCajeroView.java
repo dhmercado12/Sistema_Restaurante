@@ -34,8 +34,7 @@ public class MenuCajeroView {
         HBox topBar = new HBox();
         topBar.setAlignment(Pos.CENTER_RIGHT);
         StackPane notifBtn = buildNotifButton();
-        StackPane suggestionBtn =
-        buildSuggestionButton();
+        HBox suggestionBtn = buildSuggestionButton();
 
 topBar.getChildren().addAll(
         suggestionBtn,
@@ -376,41 +375,48 @@ topBar.getChildren().addAll(
         box.getChildren().addAll(lineRow, tagline);
         return box;
     }
-    private static StackPane buildSuggestionButton() {
+    private static HBox buildSuggestionButton() {
 
-    StackPane stack =
-            new StackPane();
+    HBox box = new HBox(8);
 
-    Circle circle =
-            new Circle(26);
+    box.setAlignment(Pos.CENTER);
 
+    Circle circle = new Circle(20);
     circle.setFill(Color.WHITE);
+    circle.setStroke(Color.web("#DDDDDD"));
 
-    circle.setStroke(
-            Color.web("#DDDDDD")
+    Label icon = new Label("💬");
+    icon.setStyle("-fx-font-size: 16px;");
+
+    StackPane iconContainer = new StackPane(circle, icon);
+
+    Label text = new Label("Ver sugerencias");
+
+    text.setStyle(
+            "-fx-font-size: 13px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-text-fill: #CC0000;"
     );
 
-    Label icon =
-            new Label("💬");
-
-    icon.setStyle(
-            "-fx-font-size:18px;"
+    box.getChildren().addAll(
+            iconContainer,
+            text
     );
 
-    stack.getChildren().addAll(
-            circle,
-            icon
-    );
+    box.setPadding(new Insets(6, 12, 6, 12));
 
-    stack.setStyle(
+    box.setStyle(
+            "-fx-background-color: white;" +
+            "-fx-background-radius: 25;" +
+            "-fx-border-color: #DDDDDD;" +
+            "-fx-border-radius: 25;" +
             "-fx-cursor: hand;"
     );
 
-    stack.setOnMouseClicked(
-            e -> Router
-                    .goSuggestionHistoryView()
+    box.setOnMouseClicked(
+            e -> Router.goSuggestionHistoryView()
     );
 
-    return stack;
+    return box;
 }
 }

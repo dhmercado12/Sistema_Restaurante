@@ -82,6 +82,12 @@ title.setTextAlignment(TextAlignment.CENTER);
 
         usernameField.setPrefHeight(52);
 
+        usernameField.textProperty().addListener((obs, oldV, newV) -> {
+    if (newV.length() > 15) {
+        usernameField.setText(oldV);
+    }
+});
+
         usernameField.setStyle("""
             -fx-background-color: #FFFDF9;
 
@@ -120,6 +126,11 @@ title.setTextAlignment(TextAlignment.CENTER);
         passwordField.setPrefWidth(360);
 
         passwordField.setPrefHeight(52);
+        passwordField.textProperty().addListener((obs, oldV, newV) -> {
+    if (newV.length() > 15) {
+        passwordField.setText(oldV);
+    }
+});
 
         passwordField.setStyle("""
             -fx-background-color: #FFFDF9;
