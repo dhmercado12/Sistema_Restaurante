@@ -22,6 +22,7 @@ import com.dhery.views.MostrarMenuCajera;
 import com.dhery.views.EditarDatosView;
 import com.dhery.views.EstadoCocinaView;
 import com.dhery.views.ControlDeliveryView;
+import com.dhery.views.SuggestionHistoryView;
 
 
 public class Router {
@@ -43,6 +44,9 @@ public static void setUser(com.dhery.models.user user) {
     public static Role getRole() {
         return currentRole;
     }
+    public static user getCurrentUser() {
+    return currentUser;
+}
 
     private static Stage stage;
 
@@ -146,5 +150,15 @@ public static void goEstadoCocinaView() {
         stage.setScene(ControlDeliveryView.getScene(currentUser));
         stage.setTitle("Tacabron - Control de Delivery");
     }
+    public static void goSuggestionHistoryView() {
+
+    stage.setScene(
+            SuggestionHistoryView.getScene()
+    );
+
+    stage.setTitle(
+            "Tacabrón - Historial de Sugerencias"
+    );
+}
 
 }

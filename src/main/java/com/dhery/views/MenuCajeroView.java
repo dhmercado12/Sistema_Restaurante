@@ -34,7 +34,13 @@ public class MenuCajeroView {
         HBox topBar = new HBox();
         topBar.setAlignment(Pos.CENTER_RIGHT);
         StackPane notifBtn = buildNotifButton();
-        topBar.getChildren().add(notifBtn);
+        StackPane suggestionBtn =
+        buildSuggestionButton();
+
+topBar.getChildren().addAll(
+        suggestionBtn,
+        notifBtn
+);
 
         // Título
         VBox titleBox = buildTitleBox();
@@ -370,4 +376,41 @@ public class MenuCajeroView {
         box.getChildren().addAll(lineRow, tagline);
         return box;
     }
+    private static StackPane buildSuggestionButton() {
+
+    StackPane stack =
+            new StackPane();
+
+    Circle circle =
+            new Circle(26);
+
+    circle.setFill(Color.WHITE);
+
+    circle.setStroke(
+            Color.web("#DDDDDD")
+    );
+
+    Label icon =
+            new Label("💬");
+
+    icon.setStyle(
+            "-fx-font-size:18px;"
+    );
+
+    stack.getChildren().addAll(
+            circle,
+            icon
+    );
+
+    stack.setStyle(
+            "-fx-cursor: hand;"
+    );
+
+    stack.setOnMouseClicked(
+            e -> Router
+                    .goSuggestionHistoryView()
+    );
+
+    return stack;
+}
 }

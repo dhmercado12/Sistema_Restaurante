@@ -11,6 +11,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import com.dhery.models.Suggestion;
+import com.dhery.repositories.SuggestionRepository;
+
+import java.time.LocalDate;
 
 public class SuggestionView {
 
@@ -262,10 +266,7 @@ public class SuggestionView {
         );
 
         // Nombre
-        VBox fieldName = buildInputField(
-            "Tu nombre",
-            "Ejemplo: Dhery Mercado"
-        );
+      
 
         // Categoría
         VBox categoryBox = new VBox(8);
@@ -339,7 +340,7 @@ public class SuggestionView {
             areaLbl,
             txtSuggestion
         );
-
+        
         // Botón enviar
         Button btnSend = new Button("✈ ENVIAR SUGERENCIA");
 
@@ -370,18 +371,52 @@ public class SuggestionView {
 
         btnSend.setOnAction(e -> {
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    if(categoryCombo.getValue() == null
+            || txtSuggestion.getText().trim().isEmpty()) {
 
-            alert.setTitle("Sugerencia enviada");
+        Alert alert =
+                new Alert(Alert.AlertType.ERROR);
 
-            alert.setHeaderText("¡Gracias por tu sugerencia! ❤️");
+        alert.setHeaderText(null);
 
-            alert.setContentText(
-                "Tu comentario fue enviado correctamente."
-            );
+        alert.setContentText(
+                "Seleccione una categoría y escriba una sugerencia."
+        );
 
-            alert.showAndWait();
-        });
+        alert.showAndWait();
+
+        return;
+    }
+
+    SuggestionRepository.guardar(
+
+            new Suggestion(
+
+                    Router.getCurrentUser().getUsername(), // o getName()
+
+                    categoryCombo.getValue(),
+
+                    txtSuggestion.getText(),
+
+                    LocalDate.now().toString()
+
+            )
+    );
+
+    Alert alert =
+            new Alert(Alert.AlertType.INFORMATION);
+
+    alert.setHeaderText(null);
+
+    alert.setContentText(
+            "Sugerencia enviada correctamente"
+    );
+
+    alert.showAndWait();
+
+    txtSuggestion.clear();
+    categoryCombo.setValue(null);
+});
 
         HBox btnBox = new HBox(btnSend);
 
@@ -390,7 +425,6 @@ public class SuggestionView {
         card.getChildren().addAll(
             title,
             subtitle,
-            fieldName,
             categoryBox,
             areaBox,
             btnBox
