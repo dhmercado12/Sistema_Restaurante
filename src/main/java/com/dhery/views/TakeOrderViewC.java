@@ -943,6 +943,11 @@ public class TakeOrderViewC {
 
         btnConfirmar.setOnAction(e -> {
             guardarFactura();
+            // ── DESCONTAR INGREDIENTES DEL INVENTARIO ──────────────────────
+            for (OrderItem item : orderItems) {
+                com.dhery.app.AppState.descontarIngredientesPorProducto(
+                    item.getProducto(), item.getCantidad());
+            }
             Alert exito = new Alert(Alert.AlertType.INFORMATION);
             exito.setTitle("Pedido realizado");
             exito.setHeaderText("¡Gracias por su compra!");

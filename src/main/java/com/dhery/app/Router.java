@@ -26,12 +26,16 @@ import com.dhery.views.SuggestionHistoryView;
 
 
 public class Router {
-    private static com.dhery.models.user currentUser;
-public static com.dhery.models.user getCurrentUser() { return currentUser; }
+    private static user currentUser;
 
-public static void setUser(com.dhery.models.user user) {
-    currentUser = user;
-}
+    public static user getCurrentUser() {
+        return currentUser;
+    }
+
+    public static void setUser(user user) {
+        currentUser = user;
+    }
+
     public enum Role {
         CAJERO,
         CLIENTE
@@ -46,9 +50,6 @@ public static void setUser(com.dhery.models.user user) {
     public static Role getRole() {
         return currentRole;
     }
-    public static user getCurrentUser() {
-    return currentUser;
-}
 
     private static Stage stage;
 
