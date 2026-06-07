@@ -26,6 +26,8 @@ import com.dhery.views.ControlDeliveryView;
 
 public class Router {
     private static com.dhery.models.user currentUser;
+public static com.dhery.models.user getCurrentUser() { return currentUser; }
+
 public static void setUser(com.dhery.models.user user) {
     currentUser = user;
 }
@@ -134,17 +136,17 @@ public static void goMisDatosEdit(user currentUser) {
     stage.setScene(EditarDatosView.getScene(currentUser));
     stage.setTitle("Tacabrón - Editar Mis Datos");
 }
- public static void goMostrarMenuCajera(){
+public static void goMostrarMenuCajera(){
         stage.setScene(MostrarMenuCajera.getScene(currentUser));
         stage.setTitle("Tacabrón - Menú");
     }
 public static void goEstadoCocinaView() {
-        stage.setScene(EstadoCocinaView.getScene(currentUser));
-        stage.setTitle("Tacabron - Estado de Cocina");
+        stage.setScene(EstadoCocinaView.getScene());
+        stage.setTitle("Tacabrón - Estado de Cocina");
     }
     public static void goControlDeliveryView() {
-        stage.setScene(ControlDeliveryView.getScene(currentUser));
-        stage.setTitle("Tacabron - Control de Delivery");
+        stage.setScene(ControlDeliveryView.getScene());
+        stage.setTitle("Tacabrón - Control de Delivery");
     }
 
 }

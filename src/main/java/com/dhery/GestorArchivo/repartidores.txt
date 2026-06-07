@@ -1,0 +1,5 @@
+1|Carlos|LIBRE
+2|Ana|LIBRE
+3|Luis|LIBRE
+4|Sofia|LIBRE
+5|Miguel|LIBRE

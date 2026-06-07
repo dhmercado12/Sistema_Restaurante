@@ -2,3 +2,4 @@
 2|Dhery|12345|CLIENTE|Mercado|68507260|sacaba
 3|Juan|12|CLIENTE|Perez|68507260|Cochabamba -  Quillacollo
 4|Walter|walter123|CLIENTE|Alcoba|5786|xxxxxxxx
+5|jhon|12345678|CLIENTE|apaza|68605708|cercado
