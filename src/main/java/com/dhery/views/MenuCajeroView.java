@@ -34,7 +34,12 @@ public class MenuCajeroView {
         HBox topBar = new HBox();
         topBar.setAlignment(Pos.CENTER_RIGHT);
         StackPane notifBtn = buildNotifButton();
-        topBar.getChildren().add(notifBtn);
+        HBox suggestionBtn = buildSuggestionButton();
+
+topBar.getChildren().addAll(
+        suggestionBtn,
+        notifBtn
+);
 
         // Título
         VBox titleBox = buildTitleBox();
@@ -370,4 +375,48 @@ public class MenuCajeroView {
         box.getChildren().addAll(lineRow, tagline);
         return box;
     }
+    private static HBox buildSuggestionButton() {
+
+    HBox box = new HBox(8);
+
+    box.setAlignment(Pos.CENTER);
+
+    Circle circle = new Circle(20);
+    circle.setFill(Color.WHITE);
+    circle.setStroke(Color.web("#DDDDDD"));
+
+    Label icon = new Label("💬");
+    icon.setStyle("-fx-font-size: 16px;");
+
+    StackPane iconContainer = new StackPane(circle, icon);
+
+    Label text = new Label("Ver sugerencias");
+
+    text.setStyle(
+            "-fx-font-size: 13px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-text-fill: #CC0000;"
+    );
+
+    box.getChildren().addAll(
+            iconContainer,
+            text
+    );
+
+    box.setPadding(new Insets(6, 12, 6, 12));
+
+    box.setStyle(
+            "-fx-background-color: white;" +
+            "-fx-background-radius: 25;" +
+            "-fx-border-color: #DDDDDD;" +
+            "-fx-border-radius: 25;" +
+            "-fx-cursor: hand;"
+    );
+
+    box.setOnMouseClicked(
+            e -> Router.goSuggestionHistoryView()
+    );
+
+    return box;
+}
 }

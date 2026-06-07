@@ -11,6 +11,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import com.dhery.models.Suggestion;
+import com.dhery.repositories.SuggestionRepository;
+
+import java.time.LocalDate;
 
 public class SuggestionView {
 
@@ -105,21 +109,7 @@ public class SuggestionView {
         );
 
         btnBack.setOnAction(e -> Router.goMenuClienteView());
-
-        // Notificación
-        StackPane notif = new StackPane();
-
-        Circle circle = new Circle(24);
-        circle.setFill(Color.WHITE);
-        circle.setStroke(Color.web("#EEEEEE"));
-
-        Label bell = new Label("🔔");
-        bell.setStyle("-fx-font-size: 16px;");
-
-        notif.getChildren().addAll(circle, bell);
-
         topBar.setLeft(btnBack);
-        topBar.setRight(notif);
 
         return topBar;
     }
@@ -262,10 +252,7 @@ public class SuggestionView {
         );
 
         // Nombre
-        VBox fieldName = buildInputField(
-            "Tu nombre",
-            "Ejemplo: Dhery Mercado"
-        );
+      
 
         // Categoría
         VBox categoryBox = new VBox(8);
@@ -317,14 +304,31 @@ public class SuggestionView {
         );
 
         TextArea txtSuggestion = new TextArea();
+        Label contador = new Label("0 / 300");
+
+contador.setStyle(
+    "-fx-font-size: 11px;" +
+    "-fx-text-fill: #888888;"
+);
+
+txtSuggestion.textProperty().addListener((obs, oldV, newV) -> {
+    contador.setText(newV.length() + " / 300");
+});
 
         txtSuggestion.setPromptText(
             "Escribe aquí tu sugerencia..."
         );
 
+
         txtSuggestion.setWrapText(true);
 
         txtSuggestion.setPrefHeight(160);
+        txtSuggestion.textProperty().addListener((obs, oldV, newV) -> {
+
+    if (newV.length() > 300) {
+        txtSuggestion.setText(oldV);
+    }
+});
 
         txtSuggestion.setStyle(
             "-fx-background-radius: 16;" +
@@ -336,10 +340,11 @@ public class SuggestionView {
         );
 
         areaBox.getChildren().addAll(
-            areaLbl,
-            txtSuggestion
-        );
-
+    areaLbl,
+    txtSuggestion,
+    contador
+);
+        
         // Botón enviar
         Button btnSend = new Button("✈ ENVIAR SUGERENCIA");
 
@@ -370,18 +375,68 @@ public class SuggestionView {
 
         btnSend.setOnAction(e -> {
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    if(categoryCombo.getValue() == null
+            || txtSuggestion.getText().trim().isEmpty()) {
 
-            alert.setTitle("Sugerencia enviada");
+        Alert alert =
+                new Alert(Alert.AlertType.ERROR);
 
-            alert.setHeaderText("¡Gracias por tu sugerencia! ❤️");
+        alert.setHeaderText(null);
 
-            alert.setContentText(
-                "Tu comentario fue enviado correctamente."
-            );
+        alert.setContentText(
+                "Seleccione una categoría y escriba una sugerencia."
+        );
 
-            alert.showAndWait();
-        });
+        alert.showAndWait();
+
+        return;
+    }
+    String sugerencia = txtSuggestion.getText().trim();
+
+if (sugerencia.length() < 10) {
+
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+
+    alert.setHeaderText(null);
+
+    alert.setContentText(
+        "La sugerencia debe tener al menos 10 caracteres."
+    );
+
+    alert.showAndWait();
+
+    return;
+}
+
+    SuggestionRepository.guardar(
+
+            new Suggestion(
+
+                    Router.getCurrentUser().getUsername(), // o getName()
+
+                    categoryCombo.getValue(),
+
+                    txtSuggestion.getText(),
+
+                    LocalDate.now().toString()
+
+            )
+    );
+
+    Alert alert =
+            new Alert(Alert.AlertType.INFORMATION);
+
+    alert.setHeaderText(null);
+
+    alert.setContentText(
+            "Sugerencia enviada correctamente"
+    );
+
+    alert.showAndWait();
+
+    txtSuggestion.clear();
+    categoryCombo.setValue(null);
+});
 
         HBox btnBox = new HBox(btnSend);
 
@@ -390,7 +445,6 @@ public class SuggestionView {
         card.getChildren().addAll(
             title,
             subtitle,
-            fieldName,
             categoryBox,
             areaBox,
             btnBox

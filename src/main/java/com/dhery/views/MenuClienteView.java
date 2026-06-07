@@ -28,10 +28,7 @@ public class MenuClienteView {
         content.setPadding(new Insets(30, 60, 30, 60));
 
         // Barra superior con notificación
-        HBox topBar = new HBox();
-        topBar.setAlignment(Pos.CENTER_RIGHT);
-        StackPane notifBtn = buildNotifButton();
-        topBar.getChildren().add(notifBtn);
+        
 
         // Título
         VBox titleBox = buildTitleBox();
@@ -46,7 +43,6 @@ public class MenuClienteView {
         VBox taglineBox = buildTaglineBox();
 
         content.getChildren().addAll(
-            topBar,
             titleBox,
             grid,
             btnLogout,

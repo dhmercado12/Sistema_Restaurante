@@ -78,6 +78,12 @@ TextField namesField = new TextField();
 namesField.setPromptText("Ingrese sus nombres");
 
 styleField(namesField);
+// Máximo 15 caracteres
+namesField.textProperty().addListener((obs, oldV, newV) -> {
+    if (newV.length() > 15) {
+        namesField.setText(oldV);
+    }
+});
 
 // =====================================================
 // APELLIDOS
@@ -97,6 +103,12 @@ TextField lastNameField = new TextField();
 lastNameField.setPromptText("Ingrese sus apellidos");
 
 styleField(lastNameField);
+// Máximo 30 caracteres
+lastNameField.textProperty().addListener((obs, oldV, newV) -> {
+    if (newV.length() > 30) {
+        lastNameField.setText(oldV);
+    }
+});
 
 // =====================================================
 // TELÉFONO
@@ -117,6 +129,18 @@ TextField phoneField = new TextField();
 phoneField.setPromptText("Ingrese su teléfono");
 
 styleField(phoneField);
+// Solo números y máximo 8 dígitos
+phoneField.textProperty().addListener((obs, oldV, newV) -> {
+
+    if (!newV.matches("\\d*")) {
+        phoneField.setText(oldV);
+        return;
+    }
+
+    if (newV.length() > 8) {
+        phoneField.setText(oldV);
+    }
+});
 
 // =====================================================
 // DIRECCIÓN
@@ -155,6 +179,12 @@ PasswordField passwordField = new PasswordField();
 passwordField.setPromptText("Ingrese una contraseña");
 
 styleField(passwordField);
+// contraseña máximo 15
+passwordField.textProperty().addListener((obs, oldV, newV) -> {
+    if (newV.length() > 15) {
+        passwordField.setText(oldV);
+    }
+});
 
 // =====================================================
 // CONFIRMAR CONTRASEÑA
@@ -173,6 +203,12 @@ PasswordField confirmField = new PasswordField();
 confirmField.setPromptText("Repita la contraseña");
 
 styleField(confirmField);
+// Confirmar contraseña máximo 15
+confirmField.textProperty().addListener((obs, oldV, newV) -> {
+    if (newV.length() > 15) {
+        confirmField.setText(oldV);
+    }
+});
 
         // =====================================================
         // BOTÓN REGISTRO
@@ -296,6 +332,53 @@ styleField(confirmField);
 
         return;
     }
+    if (nombre.length() < 3 || nombre.length() > 15) {
+
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setHeaderText(null);
+    alert.setContentText(
+            "El nombre debe tener entre 3 y 15 caracteres"
+    );
+    alert.showAndWait();
+
+    return;
+}
+
+if (apellido.length() < 3 || apellido.length() > 30) {
+
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setHeaderText(null);
+    alert.setContentText(
+            "Los apellidos deben tener entre 3 y 30 caracteres"
+    );
+    alert.showAndWait();
+
+    return;
+}
+
+if (!telefono.matches("[67]\\d{7}")) {
+
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setHeaderText(null);
+    alert.setContentText(
+            "El teléfono debe tener 8 dígitos y comenzar con 6 o 7"
+    );
+    alert.showAndWait();
+
+    return;
+}
+
+if (password.length() < 8 || password.length() > 15) {
+
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setHeaderText(null);
+    alert.setContentText(
+            "La contraseña debe tener entre 8 y 15 caracteres"
+    );
+    alert.showAndWait();
+
+    return;
+}
 
     if (!password.equals(confirmar)) {
 

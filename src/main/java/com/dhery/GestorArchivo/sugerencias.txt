@@ -1,0 +1,6 @@
+Dhery;Otros;mejorar la atencion al cliente;2026-06-07
+Dhery;Aplicación;reducir el tiempo de respuesta ;2026-06-07
+Juan;Comida;mejorar la calidad;2026-06-07
+Juan;Ambiente;Un ambiente mas comodo;2026-06-07
+Juan;Otros;app mas intuitiva;2026-06-07
+Dhery;Comida;no mejorar;2026-06-07

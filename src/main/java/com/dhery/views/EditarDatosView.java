@@ -122,9 +122,34 @@ public class EditarDatosView {
         GridPane grid1 = buildGrid();
 
         TextField fNombre    = formField(nvl(currentUser.getUsername()));
+        fNombre.textProperty().addListener((obs, oldV, newV) -> {
+    if (newV.length() > 15) {
+        fNombre.setText(oldV);
+    }
+});
         TextField fApellidos = formField(nvl(currentUser.getApellidos()));
+        fApellidos.textProperty().addListener((obs, oldV, newV) -> {
+    if (newV.length() > 30) {
+        fApellidos.setText(oldV);
+    }
+});
         TextField fTelefono  = formField(nvl(currentUser.getTelefono()));
+       fTelefono.textProperty().addListener((obs, oldV, newV) -> {
+    if (!newV.matches("\\d*")) {
+        fTelefono.setText(oldV);
+        return;
+    }
+
+    if (newV.length() > 8) {
+        fTelefono.setText(oldV);
+    }
+});
         TextField fDireccion = formField(nvl(currentUser.getDireccion()));
+        fDireccion.textProperty().addListener((obs, oldV, newV) -> {
+    if (newV.length() > 100) {
+        fDireccion.setText(oldV);
+    }
+});
 
         VBox gNombre    = formGroup("👤  Nombre",    fNombre);
         VBox gApellidos = formGroup("👤  Apellidos", fApellidos);
@@ -143,8 +168,12 @@ public class EditarDatosView {
         GridPane grid2 = buildGrid();
 
         PasswordField fPwdActual = pwdField("Ingresa tu contraseña actual");
-        PasswordField fPwdNueva  = pwdField("Mínimo 4 caracteres");
-
+        PasswordField fPwdNueva = pwdField("Entre 8 y 15 caracteres");
+        fPwdNueva.textProperty().addListener((obs, oldV, newV) -> {
+    if (newV.length() > 15) {
+        fPwdNueva.setText(oldV);
+    }
+});
         grid2.add(formGroup("🔑  Contraseña actual", fPwdActual), 0, 0);
         grid2.add(formGroup("🔐  Nueva contraseña",  fPwdNueva),  1, 0);
 
@@ -221,9 +250,29 @@ public class EditarDatosView {
                                           String telefono, String direccion,
                                           String pwdActual, String pwdNueva) {
 
-        if (nombre.isEmpty())    return "❌ El nombre no puede estar vacío.";
-        if (apellidos.isEmpty()) return "❌ Los apellidos no pueden estar vacíos.";
+        if (nombre.isEmpty())
+    return "❌ El nombre no puede estar vacío.";
 
+if (nombre.length() < 3)
+    return "❌ El nombre debe tener al menos 3 caracteres.";
+
+if (nombre.length() > 15)
+    return "❌ El nombre no puede superar los 15 caracteres.";
+
+if (apellidos.isEmpty())
+    return "❌ Los apellidos no pueden estar vacíos.";
+
+if (apellidos.length() < 3)
+    return "❌ Los apellidos deben tener al menos 3 caracteres.";
+
+if (apellidos.length() > 30)
+    return "❌ Los apellidos no pueden superar los 30 caracteres.";
+
+if (!telefono.matches("[67]\\d{7}"))
+    return "❌ El teléfono debe tener 8 dígitos y comenzar con 6 o 7.";
+
+if (direccion.length() < 5)
+    return "❌ La dirección debe tener al menos 5 caracteres.";
         String pwdFinal = currentUser.getPassword();
 
         // Cambio de contraseña solo si se llenaron ambos campos
