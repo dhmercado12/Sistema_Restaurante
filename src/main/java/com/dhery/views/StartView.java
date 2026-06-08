@@ -95,20 +95,7 @@ public class StartView {
             -fx-cursor: hand;
         """);
 
-        Button secondaryBtn = new Button("Ver Características");
-
-        secondaryBtn.setStyle("""
-            -fx-background-color: transparent;
-            -fx-border-color: rgba(255,255,255,0.3);
-            -fx-text-fill: white;
-            -fx-font-size: 15px;
-            -fx-padding: 14 34;
-            -fx-border-radius: 14;
-            -fx-background-radius: 14;
-            -fx-cursor: hand;
-        """);
-
-        HBox buttons = new HBox(15, primaryBtn, secondaryBtn);
+        HBox buttons = new HBox(primaryBtn);
 
         VBox leftContent = new VBox(
                 22,

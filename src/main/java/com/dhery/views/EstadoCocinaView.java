@@ -24,7 +24,7 @@ public class EstadoCocinaView {
     // ── rutas ────────────────────────────────────────────────────────────────
     private static final String PEDIDOS_TXT   = "src/main/java/com/dhery/GestorArchivo/pedidos.txt";
     private static final String HISTORIAL_TXT = "src/main/java/com/dhery/GestorArchivo/historial.txt";
-
+    
     // ── paleta (imagen de referencia) ────────────────────────────────────────
     private static final String RED         = "#CC0000";
     private static final String RED_DARK    = "#AA0000";
@@ -47,6 +47,7 @@ public class EstadoCocinaView {
     private static Label   lblUltimaActualizacion;
     private static Label   lblNotifBadge;
     private static Timeline autoRefresh;
+    private static VBox colaContainer;  
 
     // platos: platoId -> [segundosRestantes, 0=en_proceso / 1=listo]
     private static final Map<String, int[]>    timers        = new LinkedHashMap<>();
@@ -147,58 +148,66 @@ public class EstadoCocinaView {
     // ════════════════════════════════════════════════════════════════════════
     // PANEL IZQUIERDO
     // ════════════════════════════════════════════════════════════════════════
-    private static VBox buildLeftPanel() {
-        VBox panel = new VBox(16);
+    // ── PANEL IZQUIERDO — reemplazar buildLeftPanel() completo ──────────────────
+private static VBox buildLeftPanel() {
+    VBox panel = new VBox(16);
 
-        // ── PEDIDOS ACTIVOS ────────────────────────────────────────────────
-        VBox activosSection = new VBox(10);
-        activosSection.setStyle(cardStyle());
-        activosSection.setPadding(new Insets(16));
+    // ── PEDIDOS ACTIVOS (EN_PROCESO) ──────────────────────────────────────
+    VBox activosSection = new VBox(10);
+    activosSection.setStyle(cardStyle());
+    activosSection.setPadding(new Insets(16));
 
-        HBox actHeader = new HBox(8);
-        actHeader.setAlignment(Pos.CENTER_LEFT);
-        Label chefIco  = new Label("👨\u200D🍳");
-        chefIco.setStyle("-fx-font-size:16px;");
-        Label actTitle = new Label("PEDIDOS ACTIVOS (5 MÁX.)");
-        actTitle.setStyle("-fx-font-size:14px; -fx-font-weight:bold; -fx-text-fill:" + RED + ";");
-        actHeader.getChildren().addAll(chefIco, actTitle);
+    HBox actHeader = new HBox(8);
+    actHeader.setAlignment(Pos.CENTER_LEFT);
+    Label chefIco  = new Label("👨‍🍳");
+    chefIco.setStyle("-fx-font-size:16px;");
+    Label actTitle = new Label("PEDIDOS ACTIVOS (EN PREPARACIÓN)");
+    actTitle.setStyle("-fx-font-size:14px; -fx-font-weight:bold; -fx-text-fill:" + RED + ";");
+    actHeader.getChildren().addAll(chefIco, actTitle);
 
-        HBox tableHeader = buildTableHeader();
-        activosContainer = new VBox(0);
-        activosSection.getChildren().addAll(actHeader, tableHeader, activosContainer);
+    HBox tableHeader = buildTableHeader();
+    activosContainer = new VBox(0);
 
-        // ── EN ESPERA ─────────────────────────────────────────────────────
-        VBox esperaSection = new VBox(10);
-        esperaSection.setStyle(cardStyle());
-        esperaSection.setPadding(new Insets(16));
+    ScrollPane activosScroll = new ScrollPane(activosContainer);
+    activosScroll.setFitToWidth(true);
+    activosScroll.setMaxHeight(220);
+    activosScroll.setStyle("-fx-background-color:transparent; -fx-background:transparent;");
 
-        HBox espHeader = new HBox(8);
-        espHeader.setAlignment(Pos.CENTER_LEFT);
-        Label sandIco  = new Label("⏳");
-        sandIco.setStyle("-fx-font-size:16px;");
-        Label espTitle = new Label("EN ESPERA (SIN PEDIDOS EN COLA)");
-        espTitle.setStyle("-fx-font-size:14px; -fx-font-weight:bold; -fx-text-fill:" + RED + ";");
-        espHeader.getChildren().addAll(sandIco, espTitle);
+    activosSection.getChildren().addAll(actHeader, tableHeader, activosScroll);
 
-        HBox emptyBox = new HBox(12);
-        emptyBox.setAlignment(Pos.CENTER_LEFT);
-        emptyBox.setPadding(new Insets(14));
-        emptyBox.setStyle("-fx-background-color:#F0FFF0; -fx-background-radius:8;");
-        Label okIco = new Label("✅");
-        okIco.setStyle("-fx-font-size:22px;");
-        VBox msgBox = new VBox(2);
-        Label msg1  = new Label("No hay pedidos en cola en este momento.");
-        msg1.setStyle("-fx-font-size:13px; -fx-font-weight:bold; -fx-text-fill:" + GREEN + ";");
-        Label msg2  = new Label("¡Excelente! La cocina está al día.");
-        msg2.setStyle("-fx-font-size:11px; -fx-text-fill:" + GRAY + ";");
-        msgBox.getChildren().addAll(msg1, msg2);
-        emptyBox.getChildren().addAll(okIco, msgBox);
-        esperaSection.getChildren().addAll(espHeader, emptyBox);
+    // ── EN COLA (EN_COLA) ─────────────────────────────────────────────────
+    // ── EN COLA ───────────────────────────────────────────────────────────
+VBox colaSection = new VBox(10);
+colaSection.setStyle(cardStyle());
+colaSection.setPadding(new Insets(16));
 
-        panel.getChildren().addAll(activosSection, esperaSection);
-        VBox.setVgrow(activosSection, Priority.ALWAYS);
-        return panel;
-    }
+HBox colaHeader = new HBox(8);
+colaHeader.setAlignment(Pos.CENTER_LEFT);
+Label sandIco  = new Label("⏳");
+sandIco.setStyle("-fx-font-size:16px;");
+Label colaTitle = new Label("EN ESPERA — COLA DE PEDIDOS");
+colaTitle.setStyle("-fx-font-size:14px; -fx-font-weight:bold; -fx-text-fill:" + ORANGE + ";");
+colaHeader.getChildren().addAll(sandIco, colaTitle);
+
+colaContainer = new VBox(8);
+colaContainer.setPadding(new Insets(4, 0, 0, 0));
+
+// ScrollPane SIN altura máxima fija → crece con el contenido
+ScrollPane colaScroll = new ScrollPane(colaContainer);
+colaScroll.setFitToWidth(true);
+colaScroll.setFitToHeight(false);   // deja que el contenido dicte la altura
+colaScroll.setStyle("-fx-background-color:transparent; -fx-background:transparent;");
+
+colaSection.getChildren().addAll(colaHeader, colaScroll);
+
+// Esto hace que colaSection se expanda y empuje hacia abajo
+VBox.setVgrow(colaSection, Priority.ALWAYS);
+VBox.setVgrow(colaScroll,  Priority.ALWAYS);
+
+panel.getChildren().addAll(activosSection, colaSection);
+VBox.setVgrow(activosSection, Priority.NEVER); // activos toma solo lo que necesita
+    return panel;
+}
 
     // Encabezado de tabla — fondo rojo, texto blanco, 4 columnas como en imagen
     private static HBox buildTableHeader() {
@@ -378,85 +387,121 @@ public class EstadoCocinaView {
     // LÓGICA DE CARGA
     // ════════════════════════════════════════════════════════════════════════
     private static void cargarPedidos() {
-        ArchivoManager arch = new ArchivoManager();
-        List<String> lineas = arch.leerLineas(PEDIDOS_TXT);
+    ArchivoManager arch = new ArchivoManager();
+    List<String> lineas = arch.leerLineas(PEDIDOS_TXT);
 
-        platosActivos.clear();
-        timers.clear();
-        activosContainer.getChildren().clear();
+    platosActivos.clear();
+    timers.clear();
+    activosContainer.getChildren().clear();
+    if (colaContainer != null) colaContainer.getChildren().clear();
 
-        for (String linea : lineas) {
-            String[] p = linea.split("\\|");
-            if (p.length < 9) continue;
-            String estadoCocina = p[7].trim();
-            if (estadoCocina.equals("ENTREGADO")
-             || estadoCocina.equals("LISTO_PARA_ENVIO")
-             || estadoCocina.equals("LISTO")) continue;
+    List<String[]> pedidosCola = new ArrayList<>();
 
-            for (int i = 8; i < p.length; i++) {
-                if (p[i].trim().isEmpty() || p[i].trim().startsWith("REP:")) continue;
-                String prod = p[i].trim();
-                String nombrePlato;
-                int qty = 1;
-                if (prod.contains(" x")) {
-                    String[] parts = prod.split(" x");
-                    nombrePlato = parts[0].trim();
-                    try { qty = Integer.parseInt(parts[1].trim()); } catch (Exception ex) { qty = 1; }
-                } else {
-                    nombrePlato = prod;
+    for (String linea : lineas) {
+        String[] p = linea.split("\\|");
+        if (p.length < 9) continue;
+        String estadoCocina = p[7].trim();
+
+        // ── COLA: mostrar en sección de espera ──────────────────────────
+        if (estadoCocina.equals("EN_COLA")) {
+            pedidosCola.add(p);
+            continue;
+        }
+
+        // ── Ignorar terminados ──────────────────────────────────────────
+        if (estadoCocina.equals("ENTREGADO")
+         || estadoCocina.equals("LISTO_PARA_ENVIO")
+         || estadoCocina.equals("LISTO")) continue;
+
+        // ── EN_PROCESO: construir platos activos ────────────────────────
+        for (int i = 8; i < p.length; i++) {
+            if (p[i].trim().isEmpty() || p[i].trim().startsWith("REP:")) continue;
+            String prod = p[i].trim();
+            String nombrePlato;
+            int qty = 1;
+            if (prod.contains(" x")) {
+                String[] parts = prod.split(" x");
+                nombrePlato = parts[0].trim();
+                try { qty = Integer.parseInt(parts[1].trim()); } catch (Exception ex) { qty = 1; }
+            } else {
+                nombrePlato = prod;
+            }
+            for (int q = 0; q < qty; q++) {
+                String platoId = p[0] + "-" + (i - 7) + "-" + q;
+                int secs = tiempoPorPlato(nombrePlato);
+                if (!timers.containsKey(platoId)) {
+                    timers.put(platoId, new int[]{secs, 0});
                 }
-                for (int q = 0; q < qty; q++) {
-                    String platoId = p[0] + "-" + (i - 7) + "-" + q;
-                    int secs = tiempoPorPlato(nombrePlato);
-                    if (!timers.containsKey(platoId)) {
-                        timers.put(platoId, new int[]{secs, 0}); // siempre EN_PROCESO (LISTO ya filtrado arriba)
-                    }
-                    String mesa = p.length > 3 ? p[3].trim() : "—";
-                    // [platoId, nombre, cliente, idPedido, estado, mesa]
-                    platosActivos.add(new String[]{platoId, nombrePlato, p[1], p[0], "EN_PROCESO", mesa});
-                }
+                String mesa = p.length > 3 ? p[3].trim() : "—";
+                platosActivos.add(new String[]{platoId, nombrePlato, p[1], p[0], "EN_PROCESO", mesa});
             }
         }
+    }
 
-        int listosCount  = 0;
-        int procesoCount = 0;
-        int totalSecs    = 0;
-        int idx = 0;
-
-        for (String[] plato : platosActivos) {
-            if (idx >= 5) break;
-            int[] td     = timers.get(plato[0]);
-            boolean listo = td != null && td[1] == 1;
-            if (listo) listosCount++;
-            else { procesoCount++; totalSecs += td != null ? td[0] : 0; }
-            activosContainer.getChildren().add(buildPlatoRow(plato, idx, listo));
-            idx++;
-        }
-
-        lblPedidosActivos.setText(String.valueOf(platosActivos.size()));
-        lblListosParaEntregar.setText(String.valueOf(listosCount));
-        lblEnProceso.setText(String.valueOf(procesoCount));
-        int avg = procesoCount > 0 ? totalSecs / procesoCount : 0;
-        lblTiempoPromedio.setText(String.format("%02d:%02d", avg / 60, avg % 60));
-
-        if (lblNotifBadge != null) {
-            lblNotifBadge.setText(String.valueOf(listosCount));
-            lblNotifBadge.setVisible(listosCount > 0);
-        }
-
-        if (listosCount > 0) {
-            String hora = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
-            AppState.agregarNotificacion("PEDIDO_LISTO",
-                "✅ " + listosCount + " pedido(s) LISTO(S) para entregar · " + hora);
-        }
-
-        cargarHistorial();
-
-        if (lblUltimaActualizacion != null) {
-            lblUltimaActualizacion.setText("Última actualización: " +
-                LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+    // ── Renderizar cola ─────────────────────────────────────────────────
+    if (colaContainer != null) {
+        if (pedidosCola.isEmpty()) {
+            HBox emptyBox = new HBox(12);
+            emptyBox.setAlignment(Pos.CENTER_LEFT);
+            emptyBox.setPadding(new Insets(14));
+            emptyBox.setStyle("-fx-background-color:#F0FFF0; -fx-background-radius:8;");
+            Label okIco = new Label("✅");
+            okIco.setStyle("-fx-font-size:22px;");
+            VBox msgBox = new VBox(2);
+            Label msg1 = new Label("No hay pedidos en cola en este momento.");
+            msg1.setStyle("-fx-font-size:13px; -fx-font-weight:bold; -fx-text-fill:" + GREEN + ";");
+            Label msg2 = new Label("¡Excelente! La cocina está al día.");
+            msg2.setStyle("-fx-font-size:11px; -fx-text-fill:" + GRAY + ";");
+            msgBox.getChildren().addAll(msg1, msg2);
+            emptyBox.getChildren().addAll(okIco, msgBox);
+            colaContainer.getChildren().add(emptyBox);
+        } else {
+            for (String[] p : pedidosCola) {
+                colaContainer.getChildren().add(buildColaRow(p));
+            }
         }
     }
+
+    // ── Renderizar activos (máx 5) ──────────────────────────────────────
+    int listosCount  = 0;
+    int procesoCount = 0;
+    int totalSecs    = 0;
+    int idx = 0;
+
+    for (String[] plato : platosActivos) {
+        if (idx >= 5) break;
+        int[] td     = timers.get(plato[0]);
+        boolean listo = td != null && td[1] == 1;
+        if (listo) listosCount++;
+        else { procesoCount++; totalSecs += td != null ? td[0] : 0; }
+        activosContainer.getChildren().add(buildPlatoRow(plato, idx, listo));
+        idx++;
+    }
+
+    lblPedidosActivos.setText(String.valueOf(platosActivos.size()));
+    lblListosParaEntregar.setText(String.valueOf(listosCount));
+    lblEnProceso.setText(String.valueOf(procesoCount));
+    int avg = procesoCount > 0 ? totalSecs / procesoCount : 0;
+    lblTiempoPromedio.setText(String.format("%02d:%02d", avg / 60, avg % 60));
+
+    if (lblNotifBadge != null) {
+        lblNotifBadge.setText(String.valueOf(listosCount));
+        lblNotifBadge.setVisible(listosCount > 0);
+    }
+
+    if (listosCount > 0) {
+        String hora = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        AppState.agregarNotificacion("PEDIDO_LISTO",
+            "✅ " + listosCount + " pedido(s) LISTO(S) para entregar · " + hora);
+    }
+
+    cargarHistorial();
+
+    if (lblUltimaActualizacion != null) {
+        lblUltimaActualizacion.setText("Última actualización: " +
+            LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+    }
+}
 
     // ── Fila de plato activo ────────────────────────────────────────────────
     private static HBox buildPlatoRow(String[] plato, int idx, boolean listo) {
@@ -749,4 +794,75 @@ public class EstadoCocinaView {
             "-fx-border-radius:12; -fx-background-radius:12;" +
             "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.06),8,0,0,2);";
     }
+    private static HBox buildColaRow(String[] p) {
+    HBox row = new HBox(10);
+    row.setPadding(new Insets(10, 12, 10, 12));
+    row.setAlignment(Pos.CENTER);
+    row.setStyle(
+        "-fx-background-color:#FFF8E7;" +
+        "-fx-background-radius:8;" +
+        "-fx-border-color:" + ORANGE + "; -fx-border-width:1;" +
+        "-fx-border-radius:8;");
+
+    // Badge ID
+    StackPane idBox = new StackPane();
+    idBox.setPrefSize(50, 40);
+    idBox.setMinSize(50, 40);
+    Circle idCircle = new Circle(18);
+    idCircle.setFill(Color.web("#FFF3E0"));
+    Label idLbl = new Label("#" + p[0]);
+    idLbl.setStyle("-fx-font-size:11px; -fx-font-weight:bold; -fx-text-fill:" + ORANGE + ";");
+    idBox.getChildren().addAll(idCircle, idLbl);
+
+    // Info pedido
+    VBox info = new VBox(3);
+    HBox.setHgrow(info, Priority.ALWAYS);
+
+    // Construir resumen de productos
+    StringBuilder productos = new StringBuilder();
+    for (int i = 8; i < p.length; i++) {
+        if (!p[i].trim().isEmpty() && !p[i].trim().startsWith("REP:")) {
+            if (productos.length() > 0) productos.append("  ·  ");
+            productos.append(p[i].trim());
+        }
+    }
+    Label prodLbl = new Label(productos.toString());
+    prodLbl.setStyle("-fx-font-size:12px; -fx-font-weight:bold; -fx-text-fill:" + DARK + ";");
+    prodLbl.setWrapText(true);
+
+    String tipo = p.length > 4 ? p[4].trim() : "";
+    Label metaLbl = new Label("Cliente: " + p[1] + "   |   " + tipo + "   |   Total: " + (p.length > 5 ? p[5] : "?") + " Bs");
+    metaLbl.setStyle("-fx-font-size:11px; -fx-text-fill:" + GRAY + ";");
+
+    info.getChildren().addAll(prodLbl, metaLbl);
+
+    // Botón "▶ Mandar a Preparar"
+    Button btnPreparar = new Button("▶  MANDAR A PREPARAR");
+    btnPreparar.setStyle(
+        "-fx-background-color:" + GREEN + "; -fx-text-fill:white;" +
+        "-fx-font-size:11px; -fx-font-weight:bold;" +
+        "-fx-background-radius:8; -fx-cursor:hand; -fx-padding:8 14 8 14;");
+    btnPreparar.setOnAction(e -> mandarAPreparar(p[0]));
+
+    row.getChildren().addAll(idBox, info, btnPreparar);
+    return row;
+}
+private static void mandarAPreparar(String idPedido) {
+    ArchivoManager arch  = new ArchivoManager();
+    List<String>   lines = arch.leerLineas(PEDIDOS_TXT);
+    List<String>   nuevas = new ArrayList<>();
+
+    for (String linea : lines) {
+        String[] p = linea.split("\\|");
+        if (p.length >= 8 && p[0].trim().equals(idPedido.trim())
+                && p[7].trim().equals("EN_COLA")) {
+            p[7] = "EN_PROCESO";
+            nuevas.add(String.join("|", p));
+        } else {
+            nuevas.add(linea);
+        }
+    }
+    arch.reescribirLineas(PEDIDOS_TXT, nuevas);
+    cargarPedidos();  // refrescar vista inmediatamente
+}
 }

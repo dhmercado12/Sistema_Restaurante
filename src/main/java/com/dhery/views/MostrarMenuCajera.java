@@ -939,86 +939,87 @@ img.setClip(clip);
 
              case "Pastor":
             descripcion =
-                "Taco tradicional relleno de birria jugosa y queso fundido.";
+                "Auténtico taco al pastor preparado con carne marinada al estilo mexicano, acompañado de piña fresca, cebolla y cilantro que aportan un equilibrio perfecto entre dulzura y sabor.";
 
             ingredientes =
-                "• Tortilla de maíz\n" +
-                "• Birria de res\n" +
-                "• Queso mozzarella\n" +
-                "• Cilantro\n" +
-                "• Cebolla";
+                "• Tortilla de maíz......1 und\n" +
+                "• Birria de res........60 gr\n" +
+                "• Piña picada..........10 gr\n" +
+                "• Cilantro.............10 gr\n" +
+                "• Cebolla..............10 gr";
             break;
              case "quesabirria":
             descripcion =
-                "Taco tradicional relleno de birria jugosa y queso fundido.";
+                 "Crujiente tortilla dorada rellena de jugosa birria y abundante queso mozzarella fundido, una combinación irresistible para los amantes del auténtico sabor mexicano.";
 
             ingredientes =
-                "• Tortilla de maíz\n" +
-                "• Birria de res\n" +
-                "• Queso mozzarella\n" +
-                "• Cilantro\n" +
-                "• Cebolla";
+                "• Tortilla de maíz......1 und\n" +
+                "• Carne de birria.......60 gr\n" +
+                "• Queso mozzarella.....40 gr\n" +
+                "• Cilantro.............10 gr\n" +
+                "• Aceite...............10 ml\n" +
+                "• Cebolla..............10 gr";
             break;
             case "RamenBirria":
             descripcion =
-                "Taco tradicional relleno de birria jugosa y queso fundido.";
+                 "Fusión única entre la tradición japonesa y mexicana: fideos ramen bañados en un aromático caldo de birria, acompañados de tierna carne de res y un toque picante.";
 
             ingredientes =
-                "• Tortilla de maíz\n" +
-                "• Birria de res\n" +
-                "• Queso mozzarella\n" +
-                "• Cilantro\n" +
-                "• Cebolla";
+                "• Fideo ramen (cocido).150 gr\n" +
+                "• Clado de res.........350 ml\n" +
+                "• Carne birria.........80 gr\n" +
+                "• Chili................15 ml";
             break;
             case "Suadero":
             descripcion =
-                "Taco tradicional relleno de birria jugosa y queso fundido.";
-
+                "Taco tradicional de suadero cocinado lentamente para lograr una textura suave y jugosa, servido con cebolla y cilantro frescos.";
             ingredientes =
-                "• Tortilla de maíz\n" +
-                "• Birria de res\n" +
-                "• Queso mozzarella\n" +
-                "• Cilantro\n" +
-                "• Cebolla";
+                "• Tortilla de maíz......1 und\n" +
+                "• Carne de birria.......60 gr\n" +
+                "• Queso mozzarella.....40 gr\n" +
+                "• Cilantro.............10 gr\n" +
+                "• Aceite...............10 ml\n" +
+                "• Cebolla..............10 gr";
             break;
 
         case "Tacobirria":
             descripcion =
-                "Taco tradicional relleno de birria jugosa y queso fundido.";
+                "Tortilla de maíz rellena de tierna carne de birria cocida a fuego lento, servida con cebolla fresca para resaltar todo su sabor.";
 
             ingredientes =
-                "• Tortilla de maíz\n" +
-                "• Birria de res\n" +
-                "• Queso mozzarella\n" +
-                "• Cilantro\n" +
-                "• Cebolla";
+                "• Tortilla de maíz......1 und\n" +
+                "• Carne de birria.......60 gr\n" +
+                "• Aceite...............10 ml\n" +
+                "• Cebolla..............10 gr";
             break;
 
         case "Quesabirria":
             descripcion =
-                "Tortilla dorada con abundante queso y birria.";
+                "Deliciosa tortilla dorada con queso fundido y carne de birria sazonada, acompañada de cilantro y cebolla para una experiencia auténticamente mexicana.";
 
             ingredientes =
-                "• Tortilla\n" +
-                "• Birria\n" +
-                "• Queso\n" +
-                "• Cilantro\n" +
-                "• Cebolla";
+                "• Tortilla de maíz......1 und\n" +
+                "• Carne de birria.......60 gr\n" +
+                "• Queso mozzarella.....40 gr\n" +
+                "• Cilantro.............10 gr\n" +
+                "• Aceite...............10 ml\n" +
+                "• Cebolla..............10 gr";
             break;
             case "MegaBurrito":
             descripcion =
-                "Tortilla dorada con abundante queso y birria.";
+                "Un burrito gigante repleto de carne chili, arroz, guacamole y una mezcla de quesos fundidos, ideal para quienes buscan una comida abundante y llena de sabor.";
 
             ingredientes =
-                "• Tortilla\n" +
-                "• Birria\n" +
-                "• Queso\n" +
-                "• Cilantro\n" +
-                "• Cebolla";
+                "• Tortilla de arina xl..120 gr\n" +
+                "• Carne chili..........80 gr\n" +
+                "• Arroz cocido.........60 gr\n" +
+                "• Guacamole............40 ml\n" +
+                "• Queso cheddar........40 gr\n" +
+                "• Queso mozzarella.....40 gr";
             break;
             case "Lengua":
             descripcion =
-                "Tortilla dorada con abundante queso y birria.";
+                "Taco de lengua de res cocinada lentamente hasta alcanzar una textura suave y delicada, acompañado de cebolla y cilantro frescos.";
 
             ingredientes =
                 "• Tortilla\n" +
@@ -1029,49 +1030,45 @@ img.setClip(clip);
             break;
             case "Jamaica":
             descripcion =
-                "Tortilla dorada con abundante queso y birria.";
+                 "Refrescante bebida tradicional mexicana elaborada con flor de jamaica, de sabor dulce y ligeramente ácido, perfecta para acompañar cualquier platillo.";
+
 
             ingredientes =
-                "• Tortilla\n" +
-                "• Birria\n" +
-                "• Queso\n" +
-                "• Cilantro\n" +
-                "• Cebolla";
+            
+                "• Jamaica.................500 ml";
             break;
             case "Horchata":
             descripcion =
-                "Tortilla dorada con abundante queso y birria.";
+                "Bebida tradicional mexicana preparada a base de arroz y canela, cremosa, dulce y sumamente refrescante.";
 
             ingredientes =
-                "• Tortilla\n" +
-                "• Birria\n" +
-                "• Queso\n" +
-                "• Cilantro\n" +
-                "• Cebolla";
+            
+                "• Horchata.................500 ml";
             break;
 case "Nachos Supremos":
     descripcion =
-        "Promoción especial de Nachos Supremos para compartir.";
+       "Crujientes nachos cubiertos con carne chili, queso cheddar derretido y guacamole fresco, ideales para compartir y disfrutar en cualquier ocasión.";
     ingredientes =
-        "• Nachos\n" +
-        "• Carne\n" +
-        "• Queso\n" +
-        "• Guacamole\n" +
-        "• Salsa mexicana";
+                "• Nachos..............120 gr\n" +
+                "• Carne chili..........80 gr\n" +
+                "• Guacamole............50 gr\n" +
+                "• Queso cheddar........60 gr";
     break;
 
 
 case "Mega Burrito":
     descripcion =
-        "Promoción especial con MegaBurrito y acompañamientos.";
+        "Nuestra especialidad de gran tamaño: tortilla XL rellena con carne chili, arroz, guacamole y una generosa porción de quesos fundidos.";
     ingredientes =
-        "• Tortilla grande\n" +
-        "• Carne\n" +
-        "• Frijoles\n" +
-        "• Arroz\n" +
-        "• Queso";
+                "• Tortilla de arina xl..120 gr\n" +
+                "• Carne chili..........80 gr\n" +
+                "• Arroz cocido.........60 gr\n" +
+                "• Guacamole............40 ml\n" +
+                "• Queso cheddar........40 gr\n" +
+                "• Queso mozzarella.....40 gr";
     break;
     }
+    
 
     VBox root = new VBox(15);
     root.setPadding(new Insets(20));

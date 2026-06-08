@@ -450,13 +450,24 @@ public class TakeOrderViewC {
         }
 
         // Celular: solo dígitos, máx 15
-        tfCelGlobal.textProperty().addListener((obs, o, nv) -> {
-            String filtrado = nv.replaceAll("[^\\d]", "");
-            if (filtrado.length() > 15) filtrado = filtrado.substring(0, 15);
-            if (!filtrado.equals(nv)) tfCelGlobal.setText(filtrado);
-            celValLbl.setText(tfCelGlobal.getText().isEmpty() ? "—" : tfCelGlobal.getText());
-        });
+        // Celular: solo números, máximo 8 dígitos
+tfCelGlobal.textProperty().addListener((obs, o, nv) -> {
+    String filtrado = nv.replaceAll("[^\\d]", "");
 
+    if (filtrado.length() > 8) {
+        filtrado = filtrado.substring(0, 8);
+    }
+
+    if (!filtrado.equals(nv)) {
+        tfCelGlobal.setText(filtrado);
+    }
+
+    celValLbl.setText(
+        tfCelGlobal.getText().isEmpty()
+            ? "—"
+            : tfCelGlobal.getText()
+    );
+});
         // Nombre: solo letras y espacios, máx 50
         tfNombreGlobal.textProperty().addListener((obs, o, nv) -> {
             String filtrado = nv.replaceAll("[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ ]", "");
@@ -831,29 +842,20 @@ public class TakeOrderViewC {
             }
 
             // ── V4: celular ────────────────────────────────────────────────
-            if (celular.isEmpty()) {
-                mostrarError("Celular requerido", "El número de celular es obligatorio.");
-                if (tfCelGlobal != null) tfCelGlobal.requestFocus();
-                return;
-            }
-            if (!celular.matches("\\d+")) {
-                mostrarError("Celular inválido",
-                    "El celular solo debe contener números.");
-                if (tfCelGlobal != null) tfCelGlobal.requestFocus();
-                return;
-            }
-            if (celular.length() < 7) {
-                mostrarError("Celular muy corto",
-                    "El número de celular debe tener al menos 7 dígitos.");
-                if (tfCelGlobal != null) tfCelGlobal.requestFocus();
-                return;
-            }
-            if (celular.length() > 15) {
-                mostrarError("Celular muy largo",
-                    "El número de celular no puede superar los 15 dígitos.");
-                if (tfCelGlobal != null) tfCelGlobal.requestFocus();
-                return;
-            }
+            // ── V4: celular ────────────────────────────────────────────────
+if (celular.isEmpty()) {
+    mostrarError("Celular requerido",
+        "El número de celular es obligatorio.");
+    tfCelGlobal.requestFocus();
+    return;
+}
+
+if (!celular.matches("[67]\\d{7}")) {
+    mostrarError("Celular inválido",
+        "El número debe tener exactamente 8 dígitos y comenzar con 6 o 7.");
+    tfCelGlobal.requestFocus();
+    return;
+}
 
             generarFactura();
         });
@@ -942,6 +944,7 @@ public class TakeOrderViewC {
             " -fx-background-radius: 8; -fx-cursor: hand;");
 
         btnConfirmar.setOnAction(e -> {
+             guardarPedido();
             guardarFactura();
             // ── DESCONTAR INGREDIENTES DEL INVENTARIO ──────────────────────
             for (OrderItem item : orderItems) {
@@ -1013,4 +1016,61 @@ public class TakeOrderViewC {
         }
         return max + 1;
     }
+    private static void guardarPedido() {
+    ArchivoManager archivo = new ArchivoManager();
+
+    int idPedido = generarIdPedido();
+
+    StringBuilder productos = new StringBuilder();
+
+    for (OrderItem item : orderItems) {
+        if (productos.length() > 0)
+            productos.append("|");
+
+        productos.append(item.getProducto())
+                 .append(" x")
+                 .append(item.getCantidad());
+    }
+
+    int subtotal = 0;
+
+    for (OrderItem item : orderItems) {
+        subtotal += item.getCantidad() * item.getPrecio();
+    }
+
+    int total = subtotal + (isDelivery ? 10 : 0);
+
+    String linea =
+        idPedido + "|"
+        + nombreValLbl.getText() + "|"
+        + celValLbl.getText() + "|"
+        + dirValLbl.getText() + "|"
+        + (isDelivery ? "DELIVERY" : "LOCAL") + "|"
+        + total + "|"
+        + "Efectivo|"
+        + "EN_COLA|"
+        + productos;
+
+    archivo.agregarLinea(
+        "src/main/java/com/dhery/GestorArchivo/pedidos.txt",
+        linea
+    );
+}
+private static int generarIdPedido() {
+    ArchivoManager archivo = new ArchivoManager();
+
+    List<String> lineas = archivo.leerLineas(
+        "src/main/java/com/dhery/GestorArchivo/pedidos.txt");
+
+    int max = 0;
+
+    for (String l : lineas) {
+        try {
+            int id = Integer.parseInt(l.split("\\|")[0]);
+            if (id > max) max = id;
+        } catch (Exception ignored) {}
+    }
+
+    return max + 1;
+}
 }
