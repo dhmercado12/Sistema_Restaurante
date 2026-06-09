@@ -942,6 +942,7 @@ if (!celular.matches("[67]\\d{7}")) {
             "-fx-background-color: " + GREEN + "; -fx-text-fill: white;" +
             " -fx-font-weight: bold; -fx-font-size: 13px;" +
             " -fx-background-radius: 8; -fx-cursor: hand;");
+            
 
         btnConfirmar.setOnAction(e -> {
              guardarPedido();
@@ -961,12 +962,26 @@ if (!celular.matches("[67]\\d{7}")) {
             refreshTotals();
             facturaStage.close();
         });
+        Button btnCancelar = new Button("CANCELAR");
+
+btnCancelar.setStyle(
+    "-fx-background-color: " + RED + "; -fx-text-fill: white;" +
+    " -fx-font-weight: bold; -fx-font-size: 13px;" +
+    " -fx-background-radius: 8; -fx-cursor: hand;"
+);
+
+btnCancelar.setOnAction(e -> {
+    facturaStage.close();
+});
+HBox botones = new HBox(10);
+botones.setAlignment(Pos.CENTER);
+botones.getChildren().addAll(btnConfirmar, btnCancelar);
 
         root.getChildren().addAll(
-            titleLbl, subtitle, sep1,
-            cliente, direccion, celular, entrega,
-            sep2, itemsBox, sep3,
-            totalLblFinal, gracias, btnConfirmar);
+    titleLbl, subtitle, sep1,
+    cliente, direccion, celular, entrega,
+    sep2, itemsBox, sep3,
+    totalLblFinal, gracias, botones);
 
         Scene scene = new Scene(root, 360, 520);
         facturaStage.setTitle("Factura Tacabrón");
@@ -1048,7 +1063,7 @@ if (!celular.matches("[67]\\d{7}")) {
         + (isDelivery ? "DELIVERY" : "LOCAL") + "|"
         + total + "|"
         + "Efectivo|"
-        + "EN_COLA|"
+        + "EN_PROCESO|"
         + productos;
 
     archivo.agregarLinea(

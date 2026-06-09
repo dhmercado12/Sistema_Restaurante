@@ -75,19 +75,21 @@ public class UserRepository {
     }
 
     public boolean existeUsuario(
-            String username) {
+        String username,
+        String apellidos) {
 
-        for (user user : listarUsuarios()) {
+    for (user user : listarUsuarios()) {
 
-            if (user.getUsername()
-                    .equalsIgnoreCase(username)) {
+        if (user.getUsername().equalsIgnoreCase(username)
+                &&
+            user.getApellidos().equalsIgnoreCase(apellidos)) {
 
-                return true;
-            }
+            return true;
         }
-
-        return false;
     }
+
+    return false;
+}
 
     public void guardarUsuario(
             user user) {
@@ -111,5 +113,6 @@ public class UserRepository {
 
     return maxId + 1;
 }
+
 
 }

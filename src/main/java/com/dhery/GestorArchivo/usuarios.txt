@@ -1,5 +1,8 @@
-1|admin|1234|ADMIN|||
-2|Dhery|12345|CLIENTE|Mercado|68503639|cochabamba-sacaba
-3|Juan|12|CLIENTE|Perez|68507260|Cochabamba -  Quillacollo
-4|Walter|walter123|CLIENTE|Alcoba|5786|xxxxxxxx
-5|jhon|12345678|CLIENTE|apaza|68605708|cercado
+1|cocina|1234|ADMIN|||
+2|cajera|1234|ADMIN|||
+3|delivery|1234|ADMIN|||
+4|Dhery|12345|CLIENTE|Mercado|68503639|cochabamba-sacaba
+5|Juan|12|CLIENTE|Perez|68507260|Cochabamba -  Quillacollo
+6|Walter|walter123|CLIENTE|Alcoba|5786|xxxxxxxx
+7|jhon|12345678|CLIENTE|apaza|68605708|cercado
+8|jhon|12345678|CLIENTE|apaz|68605708|cercado

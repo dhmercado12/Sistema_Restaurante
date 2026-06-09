@@ -368,7 +368,7 @@ if (!telefono.matches("[67]\\d{7}")) {
     return;
 }
 
-if (password.length() < 8 || password.length() > 15) {
+if (password.length() < 3 || password.length() > 15) {
 
     Alert alert = new Alert(Alert.AlertType.ERROR);
     alert.setHeaderText(null);
@@ -393,17 +393,19 @@ if (password.length() < 8 || password.length() > 15) {
     UserRepository repository =
             new UserRepository();
 
-    if (repository.existeUsuario(nombre)) {
+    if (repository.existeUsuario(
+        nombre,
+        apellido)) {
 
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText(null);
-        alert.setContentText(
-                "Ya existe un usuario con ese nombre"
-        );
-        alert.showAndWait();
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setHeaderText(null);
+    alert.setContentText(
+            "Ya existe un usuario con ese nombre"
+    );
+    alert.showAndWait();
 
-        return;
-    }
+    return;
+}
 
     user nuevoUsuario = new user(
             repository.generarNuevoId(),

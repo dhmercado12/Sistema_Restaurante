@@ -226,7 +226,32 @@ title.setTextAlignment(TextAlignment.CENTER);
         
     if (user.getRol().equals("ADMIN")) {
 
+        if(user.getUsername().equalsIgnoreCase("delivery")){
+
+        Router.goControlDeliveryView();
+        }else if(user.getUsername().equalsIgnoreCase("cajera")){
+
         Router.goMenuCajeroView(user);
+        }else if(user.getUsername().equalsIgnoreCase("cocina")){
+
+        Router.goEstadoCocinaView();
+        }else{
+            Alert alert = new Alert(
+                Alert.AlertType.ERROR
+        );
+
+        alert.setHeaderText(null);
+
+        alert.setContentText(
+                "Porfavor introduzca correctamente sus credenciales"
+        );
+
+        alert.showAndWait();
+
+        return;
+        }
+
+        
 
     } else {
 
