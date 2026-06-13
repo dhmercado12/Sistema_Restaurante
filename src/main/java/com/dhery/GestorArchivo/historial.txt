@@ -42,3 +42,5 @@ Pedido #5|jhon apaza|04:41|ENTREGADO
 JAMAICA x5|froilan|04:43|LISTO
 JAMAICA x5|max|05:13|LISTO
 Pedido #7|max|05:15|ENTREGADO
+HORCHATA x1|juampa|17:54|LISTO
+Pedido #8|juampa|17:55|ENTREGADO

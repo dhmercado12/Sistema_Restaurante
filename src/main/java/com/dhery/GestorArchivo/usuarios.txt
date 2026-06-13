@@ -1,9 +1,11 @@
-1|cocina|1234|ADMIN|||
 2|cajera|1234|ADMIN|||
-3|delivery|1234|ADMIN|||
 4|admin|1234|ADMIN|||
 5|Dhery|12345|CLIENTE|Mercado|68503639|cochabamba-sacaba
 6|Juan|12|CLIENTE|Perez|68507260|Cochabamba -  Quillacollo
 7|Walter|walter123|CLIENTE|Alcoba|5786|xxxxxxxx
 8|jhon|12345678|CLIENTE|apaza|68605708|cercado
-9|jhon|12345678|CLIENTE|apaz|68605708|cercado
+10|Carlos|carlos1234|ADMIN|Mamani Quispe|71234567|
+11|Ana|ana1234|ADMIN|Lopez Flores|72345678|
+12|Luis|luis1234|ADMIN|Gutierrez Poma|73456789|
+13|Sofia|sofia1234|ADMIN|Condori Vargas|74567890|
+14|Miguel|miguel1234|ADMIN|Torrez Blanco|75678901|

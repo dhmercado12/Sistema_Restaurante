@@ -18,6 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -858,10 +859,11 @@ public class AdminDashboardView {
                 (u.getUsername().toLowerCase().contains("cajera") ||
                  u.getUsername().toLowerCase().contains("cajero"))).count();
 
-        // Delivery: rol ADMIN y username contiene "delivery"
-        long deliveries = allUsers.stream()
-            .filter(u -> "ADMIN".equalsIgnoreCase(u.getRol()) &&
-                u.getUsername().toLowerCase().contains("delivery")).count();
+        // Delivery: contar desde repartidores.txt (fuente de verdad)
+        com.dhery.GestorArchivo.ArchivoManager arch2 =
+            new com.dhery.GestorArchivo.ArchivoManager();
+        long deliveries = arch2.leerLineas(REPARTIDORES_TXT).stream()
+            .filter(l -> !l.trim().isEmpty()).count();
 
         // Productos en catálogo: contar desde AppState
         long productos  = AppState.inventario.size();
@@ -965,7 +967,12 @@ public class AdminDashboardView {
      * El rol guardado es "ADMIN" para mantener compatibilidad con el login existente,
      * y el username distingue cajera/delivery (como en ClientLoginView).
      */
+    private static final String REPARTIDORES_TXT =
+        "src/main/java/com/dhery/GestorArchivo/repartidores.txt";
+
     private static void mostrarDialogoCrearUsuario(String tipo) {
+        boolean esDelivery = "DELIVERY".equalsIgnoreCase(tipo);
+
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Crear " + tipo);
         dialog.setHeaderText("Nuevo usuario — " + tipo);
@@ -976,40 +983,61 @@ public class AdminDashboardView {
 
         TextField tfUsername  = new TextField();
         tfUsername.setPromptText("Nombre de usuario");
-        PasswordField tfPass  = new PasswordField();
-        tfPass.setPromptText("Contraseña");
         TextField tfApellidos = new TextField();
         tfApellidos.setPromptText("Apellidos");
         TextField tfTelefono  = new TextField();
         tfTelefono.setPromptText("Teléfono");
+
+        int row = 0;
+        grid.add(new Label("Usuario:"),   0, row); grid.add(tfUsername,  1, row++);
+
+        // Contraseña y Dirección solo para CAJERO, no para DELIVERY
+        PasswordField tfPass  = new PasswordField();
         TextField tfDireccion = new TextField();
-        tfDireccion.setPromptText("Dirección");
+        if (!esDelivery) {
+            tfPass.setPromptText("Contraseña");
+            tfDireccion.setPromptText("Dirección");
+            grid.add(new Label("Contraseña:"), 0, row); grid.add(tfPass,      1, row++);
+        }
 
-        grid.add(new Label("Usuario:"),   0, 0); grid.add(tfUsername,  1, 0);
-        grid.add(new Label("Contraseña:"),0, 1); grid.add(tfPass,      1, 1);
-        grid.add(new Label("Apellidos:"), 0, 2); grid.add(tfApellidos, 1, 2);
-        grid.add(new Label("Teléfono:"),  0, 3); grid.add(tfTelefono,  1, 3);
-        grid.add(new Label("Dirección:"), 0, 4); grid.add(tfDireccion, 1, 4);
+        grid.add(new Label("Apellidos:"), 0, row); grid.add(tfApellidos, 1, row++);
+        grid.add(new Label("Teléfono:"),  0, row); grid.add(tfTelefono,  1, row++);
 
-        // Indicador del tipo (prefijo recomendado)
-        Label hint = new Label("💡 Para " + tipo + ", el sistema usará el rol ADMIN " +
-            "y redirigirá por username al panel correspondiente.");
+        if (!esDelivery) {
+            grid.add(new Label("Dirección:"), 0, row); grid.add(tfDireccion, 1, row++);
+        }
+
+        Label hint;
+        if (esDelivery) {
+            hint = new Label("💡 El repartidor se vinculará automáticamente al panel\n" +
+                "de Control de Delivery con estado LIBRE.");
+        } else {
+            hint = new Label("💡 Para " + tipo + ", el sistema usará el rol ADMIN " +
+                "y redirigirá por username al panel correspondiente.");
+        }
         hint.setWrapText(true);
         hint.setStyle("-fx-font-size: 11px; -fx-text-fill: #888;");
-        grid.add(hint, 0, 5, 2, 1);
+        grid.add(hint, 0, row, 2, 1);
 
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
-                String username = tfUsername.getText().trim();
-                String pass     = tfPass.getText();
-                String apellidos= tfApellidos.getText().trim();
-                String telefono = tfTelefono.getText().trim();
-                String direccion= tfDireccion.getText().trim();
+                String username  = tfUsername.getText().trim();
+                String apellidos = tfApellidos.getText().trim();
+                String telefono  = tfTelefono.getText().trim();
 
-                if (username.isEmpty() || pass.isEmpty()) {
+                if (username.isEmpty()) {
+                    new Alert(Alert.AlertType.WARNING,
+                        "El nombre de usuario es obligatorio.").showAndWait();
+                    return;
+                }
+
+                String pass     = esDelivery ? "delivery1234" : tfPass.getText();
+                String direccion = esDelivery ? "" : tfDireccion.getText().trim();
+
+                if (!esDelivery && pass.isEmpty()) {
                     new Alert(Alert.AlertType.WARNING,
                         "Usuario y contraseña son obligatorios.").showAndWait();
                     return;
@@ -1017,119 +1045,517 @@ public class AdminDashboardView {
 
                 UserRepository repo = new UserRepository();
                 int nuevoId = repo.generarNuevoId();
-                // Rol ADMIN para compatibilidad; se distingue por username
                 user nuevoUser = new user(nuevoId, username, pass, "ADMIN",
                     apellidos, telefono, direccion);
                 repo.guardarUsuario(nuevoUser);
 
+                // Si es DELIVERY, registrar también en repartidores.txt
+                if (esDelivery) {
+                    com.dhery.GestorArchivo.ArchivoManager arch =
+                        new com.dhery.GestorArchivo.ArchivoManager();
+                    List<String> reps = arch.leerLineas(REPARTIDORES_TXT);
+                    int nextRepId = reps.size() + 1;
+                    arch.agregarLinea(REPARTIDORES_TXT,
+                        nextRepId + "|" + username + "|LIBRE");
+                }
+
                 new Alert(Alert.AlertType.INFORMATION,
                     "✅ " + tipo + " creado correctamente.\n" +
-                    "Usuario: " + username).showAndWait();
+                    "Usuario: " + username +
+                    (esDelivery ? "\n🛵 Repartidor registrado en el panel de Delivery." : ""))
+                    .showAndWait();
             }
         });
     }
 
+    /** Determina el rol visible según username y rol interno. */
+    private static String resolverRolVisible(user u) {
+        String username = u.getUsername().toLowerCase();
+        String rol      = u.getRol().toUpperCase();
+        if ("CLIENTE".equals(rol))  return "CLIENTE";
+        // Rol ADMIN: distinguir por username o por presencia en repartidores
+        com.dhery.GestorArchivo.ArchivoManager archTmp =
+            new com.dhery.GestorArchivo.ArchivoManager();
+        boolean esRepartidor = archTmp.leerLineas(REPARTIDORES_TXT).stream()
+            .anyMatch(l -> { String[] p = l.split("\\|"); return p.length > 1 &&
+                p[1].trim().equalsIgnoreCase(u.getUsername()); });
+        if (esRepartidor)                           return "DELIVERY";
+        if (username.contains("cajera") || username.contains("cajero")) return "CAJERO";
+        if (username.contains("cocina"))            return "COCINA";
+        if (username.equals("admin"))               return "ADMINISTRADOR";
+        return "ADMIN";
+    }
+
+    /** Color de badge según rol visible. */
+    private static String colorRol(String rolVisible) {
+        switch (rolVisible) {
+            case "ADMINISTRADOR": return "#1565C0";
+            case "CAJERO":        return "#6A1B9A";
+            case "DELIVERY":      return "#E8890C";
+            case "COCINA":        return "#2E7D32";
+            case "CLIENTE":       return "#888888";
+            default:              return "#555555";
+        }
+    }
+
     private static void mostrarDialogoEditarUsuario() {
         UserRepository repo = new UserRepository();
-        List<user> usuarios = repo.listarUsuarios();
+        List<user> todos = repo.listarUsuarios();
 
-        if (usuarios.isEmpty()) {
+        if (todos.isEmpty()) {
             new Alert(Alert.AlertType.INFORMATION, "No hay usuarios registrados.").showAndWait();
             return;
         }
 
-        // Primero elegir el usuario
-        ChoiceDialog<String> chooser = new ChoiceDialog<>(
-            usuarios.get(0).getUsername(),
-            usuarios.stream().map(u -> u.getId() + " – " + u.getUsername()).toList()
-        );
-        chooser.setTitle("Editar Usuario");
-        chooser.setHeaderText("Selecciona el usuario a editar:");
-        chooser.setContentText("Usuario:");
+        // ── Ventana principal tipo tabla ─────────────────────────────────────
+        Stage stage = new Stage();
+        stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        stage.setTitle("Editar Usuarios");
+        stage.setMinWidth(860);
+        stage.setMinHeight(520);
 
-        chooser.showAndWait().ifPresent(selected -> {
-            int selectedId = Integer.parseInt(selected.split("–")[0].trim());
-            user target = usuarios.stream()
-                .filter(u -> u.getId() == selectedId)
-                .findFirst().orElse(null);
-            if (target == null) return;
+        VBox root = new VBox(0);
+        root.setStyle("-fx-background-color:#F5F5F5;");
 
-            // Diálogo de edición
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Editar: " + target.getUsername());
+        // Encabezado
+        HBox header = new HBox(10);
+        header.setPadding(new Insets(20, 28, 16, 28));
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setStyle("-fx-background-color:white;" +
+            "-fx-border-color:#EEEEEE; -fx-border-width:0 0 1 0;");
+        Circle dot = new Circle(7, Color.web(ROJO));
+        Label titulo = new Label("EDITAR USUARIO");
+        titulo.setStyle("-fx-font-size:20px; -fx-font-weight:bold; -fx-text-fill:" + ROJO + ";");
+        header.getChildren().addAll(dot, titulo);
 
-            GridPane grid = new GridPane();
-            grid.setHgap(12); grid.setVgap(12);
-            grid.setPadding(new Insets(20));
+        // Cabecera de tabla
+        String[] cols   = {"ID", "Usuario", "Nombre", "Rol", "Estado", "Acciones"};
+        double[] widths = { 55,   130,        200,      140,   110,       130 };
 
-            TextField tfUsername  = new TextField(target.getUsername());
-            PasswordField tfPass  = new PasswordField();
-            tfPass.setPromptText("Nueva contraseña (dejar vacío para no cambiar)");
-            TextField tfApellidos = new TextField(target.getApellidos());
-            TextField tfTelefono  = new TextField(target.getTelefono());
-            TextField tfDireccion = new TextField(target.getDireccion());
+        HBox colHeader = new HBox(0);
+        colHeader.setPadding(new Insets(10, 28, 10, 28));
+        colHeader.setStyle("-fx-background-color:white;" +
+            "-fx-border-color:#EEEEEE; -fx-border-width:0 0 1 0;");
+        for (int i = 0; i < cols.length; i++) {
+            Label lbl = new Label(cols[i]);
+            lbl.setPrefWidth(widths[i]);
+            lbl.setStyle("-fx-font-size:13px; -fx-font-weight:bold; -fx-text-fill:#1A1A1A;");
+            colHeader.getChildren().add(lbl);
+        }
 
-            grid.add(new Label("Usuario:"),   0, 0); grid.add(tfUsername,  1, 0);
-            grid.add(new Label("Contraseña:"),0, 1); grid.add(tfPass,      1, 1);
-            grid.add(new Label("Apellidos:"), 0, 2); grid.add(tfApellidos, 1, 2);
-            grid.add(new Label("Teléfono:"),  0, 3); grid.add(tfTelefono,  1, 3);
-            grid.add(new Label("Dirección:"), 0, 4); grid.add(tfDireccion, 1, 4);
+        // Filas scrolleables
+        ScrollPane scroll = new ScrollPane();
+        scroll.setFitToWidth(true);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setStyle("-fx-background-color:transparent; -fx-background:#F5F5F5;");
+        VBox.setVgrow(scroll, Priority.ALWAYS);
 
-            dialog.getDialogPane().setContent(grid);
-            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        VBox tabla = new VBox(0);
+        tabla.setStyle("-fx-background-color:#F5F5F5;");
 
-            dialog.showAndWait().ifPresent(r -> {
-                if (r == ButtonType.OK) {
-                    target.setUsername(tfUsername.getText().trim());
-                    if (!tfPass.getText().isEmpty()) target.setPassword(tfPass.getText());
-                    target.setApellidos(tfApellidos.getText().trim());
-                    target.setTelefono(tfTelefono.getText().trim());
+        for (user u : todos) {
+            String rolVisible = resolverRolVisible(u);
+            String nombre     = (u.getUsername() + " " + u.getApellidos()).trim();
+
+            HBox fila = new HBox(0);
+            fila.setPadding(new Insets(12, 28, 12, 28));
+            fila.setAlignment(Pos.CENTER_LEFT);
+            fila.setStyle("-fx-background-color:white;" +
+                "-fx-border-color:#EEEEEE; -fx-border-width:0 0 1 0;");
+
+            // ID
+            Label lblId = new Label(String.valueOf(u.getId()));
+            lblId.setPrefWidth(widths[0]);
+            lblId.setStyle("-fx-font-size:13px; -fx-text-fill:#1A1A1A;");
+
+            // Usuario
+            Label lblUser = new Label(u.getUsername());
+            lblUser.setPrefWidth(widths[1]);
+            lblUser.setStyle("-fx-font-size:13px; -fx-text-fill:#1A1A1A;");
+
+            // Nombre completo
+            Label lblNombre = new Label(nombre);
+            lblNombre.setPrefWidth(widths[2]);
+            lblNombre.setStyle("-fx-font-size:13px; -fx-text-fill:#1A1A1A;");
+
+            // Badge rol
+            Label badgeRol = new Label(rolVisible);
+            badgeRol.setPadding(new Insets(4, 12, 4, 12));
+            String cRol = colorRol(rolVisible);
+            badgeRol.setStyle(
+                "-fx-background-color:" + cRol + "22;" +
+                "-fx-text-fill:" + cRol + ";" +
+                "-fx-font-size:11px; -fx-font-weight:bold;" +
+                "-fx-background-radius:20;");
+            HBox boxRol = new HBox(badgeRol);
+            boxRol.setPrefWidth(widths[3]);
+            boxRol.setAlignment(Pos.CENTER_LEFT);
+
+            // Badge estado
+            Label badgeEst = new Label("Activo");
+            badgeEst.setPadding(new Insets(4, 12, 4, 12));
+            badgeEst.setStyle(
+                "-fx-background-color:#2E7D32;" +
+                "-fx-text-fill:white;" +
+                "-fx-font-size:11px; -fx-font-weight:bold;" +
+                "-fx-background-radius:20;");
+            HBox boxEst = new HBox(badgeEst);
+            boxEst.setPrefWidth(widths[4]);
+            boxEst.setAlignment(Pos.CENTER_LEFT);
+
+            // Botón editar
+            Button btnEditar = new Button("✏  Editar");
+            btnEditar.setPrefWidth(110);
+            String estNormal =
+                "-fx-background-color:white;" +
+                "-fx-border-color:#1565C0; -fx-border-radius:6;" +
+                "-fx-background-radius:6;" +
+                "-fx-text-fill:#1565C0; -fx-font-size:12px;" +
+                "-fx-font-weight:bold; -fx-cursor:hand;";
+            String estHover =
+                "-fx-background-color:#E3F2FD;" +
+                "-fx-border-color:#1565C0; -fx-border-radius:6;" +
+                "-fx-background-radius:6;" +
+                "-fx-text-fill:#1565C0; -fx-font-size:12px;" +
+                "-fx-font-weight:bold; -fx-cursor:hand;";
+            btnEditar.setStyle(estNormal);
+            btnEditar.setOnMouseEntered(e -> btnEditar.setStyle(estHover));
+            btnEditar.setOnMouseExited(e  -> btnEditar.setStyle(estNormal));
+
+            // Acción editar → abre sub-diálogo
+            final user target = u;
+            final List<user> todosRef = todos;
+            btnEditar.setOnAction(e ->
+                abrirFormEdicion(target, todosRef, rolVisible, tabla, stage));
+
+            HBox boxAccion = new HBox(btnEditar);
+            boxAccion.setPrefWidth(widths[5]);
+            boxAccion.setAlignment(Pos.CENTER_LEFT);
+
+            fila.getChildren().addAll(
+                lblId, lblUser, lblNombre, boxRol, boxEst, boxAccion);
+
+            // Hover fila
+            fila.setOnMouseEntered(e ->
+                fila.setStyle("-fx-background-color:#F9F9F9;" +
+                    "-fx-border-color:#EEEEEE; -fx-border-width:0 0 1 0;"));
+            fila.setOnMouseExited(e ->
+                fila.setStyle("-fx-background-color:white;" +
+                    "-fx-border-color:#EEEEEE; -fx-border-width:0 0 1 0;"));
+
+            tabla.getChildren().add(fila);
+        }
+
+        scroll.setContent(tabla);
+
+        // Footer con botón cerrar
+        HBox footer = new HBox();
+        footer.setPadding(new Insets(14, 28, 14, 28));
+        footer.setAlignment(Pos.CENTER_RIGHT);
+        footer.setStyle("-fx-background-color:white;" +
+            "-fx-border-color:#EEEEEE; -fx-border-width:1 0 0 0;");
+        Button btnCerrar = new Button("Cerrar");
+        btnCerrar.setPrefSize(110, 36);
+        btnCerrar.setStyle(
+            "-fx-background-color:#EEEEEE; -fx-text-fill:#333;" +
+            "-fx-font-size:13px; -fx-background-radius:8; -fx-cursor:hand;");
+        btnCerrar.setOnAction(e -> stage.close());
+        footer.getChildren().add(btnCerrar);
+
+        root.getChildren().addAll(header, colHeader, scroll, footer);
+        stage.setScene(new Scene(root, 860, 540));
+        stage.show();
+    }
+
+    /** Sub-diálogo de edición de un usuario individual. */
+    private static void abrirFormEdicion(user target, List<user> todos,
+                                          String rolVisible, VBox tabla, Stage parentStage) {
+        boolean esDelivery = "DELIVERY".equals(rolVisible);
+        boolean esCliente  = "CLIENTE".equals(rolVisible);
+
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Editando: " + target.getUsername());
+        dialog.setHeaderText("Modificar datos de " + target.getUsername()
+            + "  [" + rolVisible + "]");
+        dialog.initOwner(parentStage);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(14); grid.setVgap(12);
+        grid.setPadding(new Insets(24));
+
+        TextField     tfUsername  = new TextField(target.getUsername());
+        PasswordField tfPass      = new PasswordField();
+        tfPass.setPromptText("Dejar vacío para no cambiar");
+        TextField     tfApellidos = new TextField(target.getApellidos());
+        TextField     tfTelefono  = new TextField(target.getTelefono());
+        TextField     tfDireccion = new TextField(target.getDireccion());
+
+        // Ancho mínimo de campos
+        tfUsername.setPrefWidth(240);
+        tfApellidos.setPrefWidth(240);
+        tfTelefono.setPrefWidth(240);
+        tfDireccion.setPrefWidth(240);
+
+        int r = 0;
+        grid.add(new Label("Usuario:"),   0, r); grid.add(tfUsername,  1, r++);
+        grid.add(new Label("Apellidos:"), 0, r); grid.add(tfApellidos, 1, r++);
+        grid.add(new Label("Teléfono:"),  0, r); grid.add(tfTelefono,  1, r++);
+
+        // Dirección solo si no es DELIVERY
+        if (!esDelivery) {
+            grid.add(new Label("Dirección:"), 0, r); grid.add(tfDireccion, 1, r++);
+        }
+        // Contraseña: no para DELIVERY
+        if (!esDelivery) {
+            grid.add(new Label("Contraseña:"), 0, r); grid.add(tfPass, 1, r++);
+        }
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dialog.getDialogPane().setPrefWidth(440);
+
+        dialog.showAndWait().ifPresent(res -> {
+            if (res == ButtonType.OK) {
+                target.setUsername(tfUsername.getText().trim());
+                target.setApellidos(tfApellidos.getText().trim());
+                target.setTelefono(tfTelefono.getText().trim());
+                if (!esDelivery) {
                     target.setDireccion(tfDireccion.getText().trim());
-
-                    // Reescribir la línea en el archivo
-                    ArchivoManagerHelper.actualizarUsuario(usuarios, target);
-                    new Alert(Alert.AlertType.INFORMATION, "✅ Usuario actualizado.").showAndWait();
+                    if (!tfPass.getText().isEmpty())
+                        target.setPassword(tfPass.getText());
                 }
-            });
+                ArchivoManagerHelper.actualizarUsuario(todos, target);
+
+                // Si es DELIVERY, actualizar también nombre en repartidores.txt
+                if (esDelivery) {
+                    com.dhery.GestorArchivo.ArchivoManager arch =
+                        new com.dhery.GestorArchivo.ArchivoManager();
+                    List<String> reps = arch.leerLineas(REPARTIDORES_TXT);
+                    List<String> nuevos = new java.util.ArrayList<>();
+                    for (String l : reps) {
+                        String[] p = l.split("\\|");
+                        if (p.length > 1 && p[1].trim()
+                                .equalsIgnoreCase(target.getUsername())) {
+                            nuevos.add(p[0] + "|" + target.getUsername()
+                                + "|" + (p.length > 2 ? p[2] : "LIBRE"));
+                        } else {
+                            nuevos.add(l);
+                        }
+                    }
+                    arch.reescribirLineas(REPARTIDORES_TXT, nuevos);
+                }
+
+                new Alert(Alert.AlertType.INFORMATION,
+                    "✅ Usuario \"" + target.getUsername() + "\" actualizado correctamente.")
+                    .showAndWait();
+
+                // Refrescar la tabla recargando la ventana
+                parentStage.close();
+                mostrarDialogoEditarUsuario();
+            }
         });
     }
 
     private static void mostrarDialogoEliminarUsuario() {
         UserRepository repo = new UserRepository();
-        List<user> usuarios = repo.listarUsuarios();
+    List<user> todos = repo.listarUsuarios();
 
-        // No permitir eliminar al administrador actual
-        usuarios.removeIf(u -> currentUser != null &&
-            u.getUsername().equalsIgnoreCase(currentUser.getUsername()));
+    // No permitir eliminar al administrador actual
+    todos.removeIf(u -> currentUser != null &&
+        u.getUsername().equalsIgnoreCase(currentUser.getUsername()));
 
-        if (usuarios.isEmpty()) {
-            new Alert(Alert.AlertType.INFORMATION, "No hay otros usuarios para eliminar.").showAndWait();
-            return;
-        }
+    if (todos.isEmpty()) {
+        new Alert(Alert.AlertType.INFORMATION, "No hay otros usuarios para eliminar.").showAndWait();
+        return;
+    }
 
-        ChoiceDialog<String> chooser = new ChoiceDialog<>(
-            usuarios.get(0).getUsername(),
-            usuarios.stream().map(u -> u.getId() + " – " + u.getUsername() +
-                " [" + u.getRol() + "]").toList()
-        );
-        chooser.setTitle("Eliminar Usuario");
-        chooser.setHeaderText("Selecciona el usuario a eliminar:");
-        chooser.setContentText("Usuario:");
+    // ── Ventana principal tipo tabla ─────────────────────────────────────
+    Stage stage = new Stage();
+    stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+    stage.setTitle("Eliminar Usuarios");
+    stage.setMinWidth(860);
+    stage.setMinHeight(520);
 
-        chooser.showAndWait().ifPresent(selected -> {
-            int selectedId = Integer.parseInt(selected.split("–")[0].trim());
+    VBox root = new VBox(0);
+    root.setStyle("-fx-background-color:#F5F5F5;");
 
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "¿Estás seguro de eliminar al usuario seleccionado? Esta acción no se puede deshacer.");
-            confirm.setHeaderText("Confirmar eliminación");
+    // Encabezado
+    HBox header = new HBox(10);
+    header.setPadding(new Insets(20, 28, 16, 28));
+    header.setAlignment(Pos.CENTER_LEFT);
+    header.setStyle("-fx-background-color:white;" +
+        "-fx-border-color:#EEEEEE; -fx-border-width:0 0 1 0;");
+    Circle dot = new Circle(7, Color.web(ROJO));
+    Label titulo = new Label("ELIMINAR USUARIO");
+    titulo.setStyle("-fx-font-size:20px; -fx-font-weight:bold; -fx-text-fill:" + ROJO + ";");
+    header.getChildren().addAll(dot, titulo);
+
+    // Cabecera de tabla
+    String[] cols   = {"ID", "Usuario", "Nombre", "Rol", "Estado", "Acciones"};
+    double[] widths = { 55,   130,        200,      140,   110,       130};
+
+    HBox colHeader = new HBox(0);
+    colHeader.setPadding(new Insets(10, 28, 10, 28));
+    colHeader.setStyle("-fx-background-color:white;" +
+        "-fx-border-color:#EEEEEE; -fx-border-width:0 0 1 0;");
+    for (int i = 0; i < cols.length; i++) {
+        Label lbl = new Label(cols[i]);
+        lbl.setPrefWidth(widths[i]);
+        lbl.setStyle("-fx-font-size:13px; -fx-font-weight:bold; -fx-text-fill:#1A1A1A;");
+        colHeader.getChildren().add(lbl);
+    }
+
+    // Filas scrolleables
+    ScrollPane scroll = new ScrollPane();
+    scroll.setFitToWidth(true);
+    scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    scroll.setStyle("-fx-background-color:transparent; -fx-background:#F5F5F5;");
+    VBox.setVgrow(scroll, Priority.ALWAYS);
+
+    VBox tabla = new VBox(0);
+    tabla.setStyle("-fx-background-color:#F5F5F5;");
+
+    for (user u : todos) {
+        String rolVisible = resolverRolVisible(u);
+        String nombre     = (u.getUsername() + " " + u.getApellidos()).trim();
+
+        HBox fila = new HBox(0);
+        fila.setPadding(new Insets(12, 28, 12, 28));
+        fila.setAlignment(Pos.CENTER_LEFT);
+        fila.setStyle("-fx-background-color:white;" +
+            "-fx-border-color:#EEEEEE; -fx-border-width:0 0 1 0;");
+
+        // ID
+        Label lblId = new Label(String.valueOf(u.getId()));
+        lblId.setPrefWidth(widths[0]);
+        lblId.setStyle("-fx-font-size:13px; -fx-text-fill:#1A1A1A;");
+
+        // Usuario
+        Label lblUser = new Label(u.getUsername());
+        lblUser.setPrefWidth(widths[1]);
+        lblUser.setStyle("-fx-font-size:13px; -fx-text-fill:#1A1A1A;");
+
+        // Nombre completo
+        Label lblNombre = new Label(nombre);
+        lblNombre.setPrefWidth(widths[2]);
+        lblNombre.setStyle("-fx-font-size:13px; -fx-text-fill:#1A1A1A;");
+
+        // Badge rol
+        Label badgeRol = new Label(rolVisible);
+        badgeRol.setPadding(new Insets(4, 12, 4, 12));
+        String cRol = colorRol(rolVisible);
+        badgeRol.setStyle(
+            "-fx-background-color:" + cRol + "22;" +
+            "-fx-text-fill:" + cRol + ";" +
+            "-fx-font-size:11px; -fx-font-weight:bold;" +
+            "-fx-background-radius:20;");
+        HBox boxRol = new HBox(badgeRol);
+        boxRol.setPrefWidth(widths[3]);
+        boxRol.setAlignment(Pos.CENTER_LEFT);
+
+        // Badge estado
+        Label badgeEst = new Label("Activo");
+        badgeEst.setPadding(new Insets(4, 12, 4, 12));
+        badgeEst.setStyle(
+            "-fx-background-color:#2E7D32;" +
+            "-fx-text-fill:white;" +
+            "-fx-font-size:11px; -fx-font-weight:bold;" +
+            "-fx-background-radius:20;");
+        HBox boxEst = new HBox(badgeEst);
+        boxEst.setPrefWidth(widths[4]);
+        boxEst.setAlignment(Pos.CENTER_LEFT);
+
+        // Botón eliminar
+        Button btnElim = new Button("🗑  Eliminar");
+        btnElim.setPrefWidth(110);
+        String estNormal =
+            "-fx-background-color:white;" +
+            "-fx-border-color:#CC0000; -fx-border-radius:6;" +
+            "-fx-background-radius:6;" +
+            "-fx-text-fill:#CC0000; -fx-font-size:12px;" +
+            "-fx-font-weight:bold; -fx-cursor:hand;";
+        String estHover =
+            "-fx-background-color:#FFF5F5;" +
+            "-fx-border-color:#CC0000; -fx-border-radius:6;" +
+            "-fx-background-radius:6;" +
+            "-fx-text-fill:#CC0000; -fx-font-size:12px;" +
+            "-fx-font-weight:bold; -fx-cursor:hand;";
+        btnElim.setStyle(estNormal);
+        btnElim.setOnMouseEntered(e -> btnElim.setStyle(estHover));
+        btnElim.setOnMouseExited(e  -> btnElim.setStyle(estNormal));
+
+        final user target = u;
+        btnElim.setOnAction(e -> {
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("Confirmar eliminación");
+            confirm.setHeaderText("¿Eliminar a \"" + target.getUsername() + "\"?");
+            confirm.setContentText("Esta acción no se puede deshacer.");
+            confirm.initOwner(stage);
             confirm.showAndWait().ifPresent(r -> {
                 if (r == ButtonType.OK) {
-                    ArchivoManagerHelper.eliminarUsuario(selectedId);
-                    new Alert(Alert.AlertType.INFORMATION, "✅ Usuario eliminado correctamente.").showAndWait();
+                    ArchivoManagerHelper.eliminarUsuario(target.getId());
+
+                    // Si es DELIVERY, eliminar también de repartidores.txt
+                    if ("DELIVERY".equals(resolverRolVisible(target))) {
+                        com.dhery.GestorArchivo.ArchivoManager arch =
+                            new com.dhery.GestorArchivo.ArchivoManager();
+                        List<String> reps = arch.leerLineas(REPARTIDORES_TXT);
+                        reps.removeIf(l -> {
+                            String[] p = l.split("\\|");
+                            return p.length > 1 &&
+                                p[1].trim().equalsIgnoreCase(target.getUsername());
+                        });
+                        arch.reescribirLineas(REPARTIDORES_TXT, reps);
+                    }
+
+                    new Alert(Alert.AlertType.INFORMATION,
+                        "✅ Usuario \"" + target.getUsername() + "\" eliminado correctamente.")
+                        .showAndWait();
+
+                    // Refrescar tabla
+                    stage.close();
+                    mostrarDialogoEliminarUsuario();
                 }
             });
         });
+
+        HBox boxAccion = new HBox(btnElim);
+        boxAccion.setPrefWidth(widths[5]);
+        boxAccion.setAlignment(Pos.CENTER_LEFT);
+
+        fila.getChildren().addAll(lblId, lblUser, lblNombre, boxRol, boxEst, boxAccion);
+
+        // Hover fila
+        fila.setOnMouseEntered(ev ->
+            fila.setStyle("-fx-background-color:#FFF5F5;" +
+                "-fx-border-color:#EEEEEE; -fx-border-width:0 0 1 0;"));
+        fila.setOnMouseExited(ev ->
+            fila.setStyle("-fx-background-color:white;" +
+                "-fx-border-color:#EEEEEE; -fx-border-width:0 0 1 0;"));
+
+        tabla.getChildren().add(fila);
     }
+
+    scroll.setContent(tabla);
+
+    // Footer con botón cerrar
+    HBox footer = new HBox();
+    footer.setPadding(new Insets(14, 28, 14, 28));
+    footer.setAlignment(Pos.CENTER_RIGHT);
+    footer.setStyle("-fx-background-color:white;" +
+        "-fx-border-color:#EEEEEE; -fx-border-width:1 0 0 0;");
+    Button btnCerrar = new Button("Cerrar");
+    btnCerrar.setPrefSize(110, 36);
+    btnCerrar.setStyle(
+        "-fx-background-color:#EEEEEE; -fx-text-fill:#333;" +
+        "-fx-font-size:13px; -fx-background-radius:8; -fx-cursor:hand;");
+    btnCerrar.setOnAction(e -> stage.close());
+    footer.getChildren().add(btnCerrar);
+
+    root.getChildren().addAll(header, colHeader, scroll, footer);
+    stage.setScene(new Scene(root, 860, 540));
+    stage.show();
+}
 
     private static void mostrarAlertasEscasez() {
         List<AppState.ItemStock> bajos = getItemsBajoStock();
