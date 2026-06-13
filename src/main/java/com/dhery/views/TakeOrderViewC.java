@@ -992,6 +992,7 @@ botones.getChildren().addAll(btnConfirmar, btnCancelar);
     private static void guardarFactura() {
         ArchivoManager archivo = new ArchivoManager();
         String fecha = java.time.LocalDate.now().toString();
+        String hora  = java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
         int subtotal = 0;
         StringBuilder detalle = new StringBuilder();
 
@@ -1011,6 +1012,7 @@ botones.getChildren().addAll(btnConfirmar, btnCancelar);
             + fecha + "|"
             + total + "|"
             + (isDelivery ? "DELIVERY" : "LOCAL") + "|"
+            + hora + "|"
             + detalle;
 
         archivo.agregarLinea(

@@ -360,7 +360,7 @@ private static user currentUser;
         ta.setPrefSize(580, 400);
         ta.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 12px;");
 
-        // Leer el archivo real si existe, sino mostrar contenido de muestra
+        // Leer el archivo real si existe (directorio facturas/)
         String ruta = f.getRutaReal();
         if (ruta != null && !ruta.isEmpty() && new File(ruta).exists()) {
             try {
@@ -368,6 +368,9 @@ private static user currentUser;
             } catch (Exception ex) {
                 ta.setText("Error al leer el archivo: " + ex.getMessage());
             }
+        } else if (ruta != null && ruta.contains("|")) {
+            // La ruta contiene la línea de facturas.txt — parsear y mostrar
+            ta.setText(generarContenidoDesdeLinea(f, ruta));
         } else {
             ta.setText(generarContenidoMuestra(f));
         }
@@ -407,6 +410,114 @@ private static user currentUser;
         }
     }
 
+    /** Genera el contenido de la factura parseando una línea de facturas.txt */
+    // Formato nuevo: id|userId|fecha|total|tipo|hora|prod1 xN, prod2 xN, ...
+    // Formato viejo: id|userId|fecha|total|tipo|prod1 xN, prod2 xN, ...
+    private static String generarContenidoDesdeLinea(Factura f, String linea) {
+        try {
+            String[] p = linea.split("\\|", -1);
+            if (p.length < 5) return generarContenidoMuestra(f);
+
+            String fecha  = p[2].trim();   // yyyy-MM-dd
+            String total  = p[3].trim();
+            String tipo   = p[4].trim();
+
+            // Detectar si p[5] es hora (HH:mm) o inicio de productos
+            String hora = "";
+            int prodStart = 5;
+            if (p.length > 5) {
+                String campo5 = p[5].trim();
+                if (campo5.matches("\\d{2}:\\d{2}")) {
+                    hora = campo5;
+                    prodStart = 6;
+                }
+            }
+
+            // Convertir fecha: yyyy-MM-dd → dd/MM/yyyy
+            String[] pf = fecha.split("-");
+            String fechaDisplay = pf.length == 3
+                ? pf[2] + "/" + pf[1] + "/" + pf[0]
+                : fecha;
+            if (!hora.isEmpty()) fechaDisplay += " " + hora;
+
+            // Calcular subtotal
+            int totalInt = Integer.parseInt(total);
+            int delivery = tipo.equals("DELIVERY") ? 10 : 0;
+            int subtotal = totalInt - delivery;
+
+            // Parsear productos
+            java.util.List<String[]> itemsParsed = new java.util.ArrayList<>();
+            for (int i = prodStart; i < p.length; i++) {
+                String seg = p[i].trim();
+                if (seg.isEmpty()) continue;
+                String[] partes = seg.split(",");
+                for (String prod : partes) {
+                    prod = prod.trim();
+                    if (prod.isEmpty()) continue;
+                    String nombre = prod;
+                    String cant = "1";
+                    if (prod.toLowerCase().contains(" x")) {
+                        int ix = prod.toLowerCase().lastIndexOf(" x");
+                        nombre = prod.substring(0, ix).trim();
+                        cant = prod.substring(ix + 2).trim();
+                    }
+                    itemsParsed.add(new String[]{nombre, cant});
+                }
+            }
+
+            // Construir bloque de productos
+            StringBuilder itemsBlock = new StringBuilder();
+            for (String[] item : itemsParsed) {
+                String nombre = item[0];
+                int cantInt = 1;
+                try { cantInt = Integer.parseInt(item[1]); } catch (Exception ignored) {}
+                int precioUnit = obtenerPrecioProducto(nombre);
+                String precioStr = precioUnit > 0
+                    ? String.format("%.2f Bs", (double) precioUnit)
+                    : "-- Bs";
+                String nombreTrunc = nombre.length() > 20 ? nombre.substring(0, 20) : nombre;
+                itemsBlock.append(String.format("  %-20s %3d  %10s%n", nombreTrunc, cantInt, precioStr));
+            }
+
+            return "===========================================" + "\n" +
+                   "       TACABRÓN RESTAURANTE" + "\n" +
+                   "       Sabor que enamora" + "\n" +
+                   "===========================================" + "\n" +
+                   "Factura: " + f.getNombre() + "\n" +
+                   "Fecha:   " + fechaDisplay + "\n" +
+                   "Tipo:    " + tipo + "\n" +
+                   "Tamaño:  " + f.getTamanio() + "\n" +
+                   "-------------------------------------------" + "\n" +
+                   "  PRODUCTO              CANT      PRECIO" + "\n" +
+                   "-------------------------------------------" + "\n" +
+                   itemsBlock.toString() +
+                   "-------------------------------------------" + "\n" +
+                   String.format("  Subtotal:               %12.2f Bs%n", (double) subtotal) +
+                   (delivery > 0 ? String.format("  Delivery:               %12.2f Bs%n", (double) delivery) : "") +
+                   String.format("  TOTAL:                  %12.2f Bs%n", (double) totalInt) +
+                   "===========================================" + "\n" +
+                   "  ¡Gracias por su preferencia!" + "\n" +
+                   "===========================================" + "\n";
+        } catch (Exception e) {
+            return generarContenidoMuestra(f);
+        }
+    }
+
+    /** Intenta obtener el precio unitario de un producto leyendo el stock/menú si disponible */
+    private static int obtenerPrecioProducto(String nombreProducto) {
+        // Tabla de precios base del menú (sincronizada con MostrarMenu)
+        java.util.Map<String, Integer> precios = new java.util.HashMap<>();
+        precios.put("BIRRIA", 35); precios.put("QUESABIRRIA", 40);
+        precios.put("SUADERO", 20); precios.put("PASTOR", 20);
+        precios.put("MEGABURRITO", 45); precios.put("RAMEN BIRRIA", 45);
+        precios.put("NACHOS SUPREMOS", 40); precios.put("NACHOS", 40);
+        precios.put("JAMAICA", 8); precios.put("HORCHATA", 10);
+        precios.put("TORTILLA EXTRA", 5);
+        precios.put("MEGABURRITO COMBO 2", 65); precios.put("NACHOS SUPREMOS COMBO 2", 55);
+        String key = nombreProducto.toUpperCase().trim();
+        return precios.getOrDefault(key, 0);
+    }
+
     private static String generarContenidoMuestra(Factura f) {
         return "===========================================\n" +
                "       TACABRÓN RESTAURANTE\n" +
@@ -431,11 +542,11 @@ private static user currentUser;
     }
 
     // ── Cargar facturas ───────────────────────────────────────────────────────
+    // Formato facturas.txt: id|userId|fecha|total|tipo|prod1 xN, prod2 xN, ...
     private static ObservableList<Factura> loadFacturas() {
         ObservableList<Factura> lista = FXCollections.observableArrayList();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-        // Buscar archivos reales en el directorio facturas/
+        // Primero intentar leer archivos físicos del directorio facturas/
         File dir = new File("facturas");
         List<File> archivos = new ArrayList<>();
         if (dir.exists() && dir.isDirectory()) {
@@ -447,6 +558,7 @@ private static user currentUser;
         }
 
         if (!archivos.isEmpty()) {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             for (int i = 0; i < archivos.size(); i++) {
                 File f = archivos.get(i);
                 String fecha = LocalDateTime.ofInstant(
@@ -458,34 +570,70 @@ private static user currentUser;
                     : String.format("%.2f KB", bytes / 1024.0);
                 lista.add(new Factura(i + 1, f.getName(), fecha, tam, f.getAbsolutePath()));
             }
-        } else {
-            // Datos de muestra si no hay directorio
-            String[][] datos = {
-                {"factura_000001_20260406_074306.txt","06/04/2026 07:43","1.25 KB"},
-                {"factura_000002_20260406_075016.txt","06/04/2026 07:50","1.26 KB"},
-                {"factura_000003_20260406_075158.txt","06/04/2026 07:51","1.26 KB"},
-                {"factura_000004_20260412_135346.txt","12/04/2026 13:53","1.26 KB"},
-                {"factura_000005_20260412_160515.txt","12/04/2026 16:05","1.25 KB"},
-                {"factura_000005_20260412_162319.txt","12/04/2026 16:23","1.25 KB"},
-                {"factura_000006_20260412_161027.txt","12/04/2026 16:10","1.26 KB"},
-                {"factura_000007_20260412_171305.txt","12/04/2026 17:13","1.26 KB"},
-                {"factura_000008_20260412_182748.txt","12/04/2026 18:27","1.26 KB"},
-                {"factura_000009_20260412_184642.txt","12/04/2026 18:46","1.26 KB"},
-                {"factura_000010_20260412_185912.txt","12/04/2026 18:59","1.26 KB"},
-                {"factura_000011_20260412_200904.txt","12/04/2026 20:09","1.26 KB"},
-                {"factura_000012_20260412_205006.txt","12/04/2026 20:50","1.25 KB"},
-                {"factura_000013_20260419_142915.txt","19/04/2026 14:29","1.25 KB"},
-                {"factura_000014_20260419_165434.txt","19/04/2026 16:54","1.25 KB"},
-                {"factura_000015_20260420_091200.txt","20/04/2026 09:12","1.26 KB"},
-                {"factura_000016_20260420_113445.txt","20/04/2026 11:34","1.25 KB"},
-                {"factura_000017_20260425_142233.txt","25/04/2026 14:22","1.26 KB"},
-                {"factura_000018_20260428_160011.txt","28/04/2026 16:00","1.25 KB"},
-            };
-            for (int i = 0; i < datos.length; i++) {
-                lista.add(new Factura(i + 1, datos[i][0], datos[i][1], datos[i][2], ""));
-            }
+            return lista;
+        }
+
+        // Si no hay directorio físico, leer desde facturas.txt
+        com.dhery.GestorArchivo.ArchivoManager arch = new com.dhery.GestorArchivo.ArchivoManager();
+        List<String> lineas = arch.leerLineas("src/main/java/com/dhery/GestorArchivo/facturas.txt");
+
+        // Cargar mapa de usuarios para resolver nombre por id
+        java.util.Map<String, String> usuarioNombres = cargarNombresUsuarios();
+
+        int contadorVisual = 1;
+        for (String linea : lineas) {
+            if (linea == null || linea.isBlank()) continue;
+            String[] p = linea.split("\\|", -1);
+            if (p.length < 5) continue;
+            try {
+                String idFact  = p[0].trim();
+                String userId  = p[1].trim();
+                String fecha   = p[2].trim();   // yyyy-MM-dd
+                String total   = p[3].trim();
+                String tipo    = p[4].trim();
+                String nombreUsuario = usuarioNombres.getOrDefault(userId, "Cliente #" + userId);
+
+                // Formato nombre archivo: factura_XXXXXX_AAAAMMDD_HHmmss.txt
+                String idPad = String.format("%06d", Integer.parseInt(idFact));
+                String fechaTag = fecha.replace("-", "");
+                String nombreArchivo = "factura_" + idPad + "_" + fechaTag + "_000000.txt";
+
+                // Fecha mostrada: dd/MM/yyyy
+                String[] partesFecha = fecha.split("-");
+                String fechaMostrada = partesFecha.length == 3
+                    ? partesFecha[2] + "/" + partesFecha[1] + "/" + partesFecha[0] + " 00:00"
+                    : fecha;
+
+                // Tamaño aproximado
+                String tam = "1.25 KB";
+
+                // Guardamos en rutaReal el contenido serializado para mostrarlo luego
+                String rutaReal = linea; // guardamos la línea original como "ruta"
+
+                lista.add(new Factura(contadorVisual, nombreArchivo, fechaMostrada, tam, rutaReal));
+                contadorVisual++;
+            } catch (Exception ignored) {}
         }
         return lista;
+    }
+
+    /** Carga mapa id -> "Nombre Apellido" desde usuarios.txt */
+    private static java.util.Map<String, String> cargarNombresUsuarios() {
+        java.util.Map<String, String> mapa = new java.util.HashMap<>();
+        com.dhery.GestorArchivo.ArchivoManager arch = new com.dhery.GestorArchivo.ArchivoManager();
+        List<String> lineas = arch.leerLineas("src/main/java/com/dhery/GestorArchivo/usuarios.txt");
+        for (String l : lineas) {
+            if (l == null || l.isBlank()) continue;
+            String[] p = l.split("\\|", -1);
+            if (p.length >= 2) {
+                String id = p[0].trim();
+                String nombre = p[1].trim();
+                if (p.length >= 5 && !p[4].isBlank())
+                    nombre = nombre + " " + p[4].trim();
+                mapa.put(id, nombre);
+            }
+        }
+        return mapa;
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

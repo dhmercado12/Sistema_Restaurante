@@ -1,4 +1,4 @@
-1|Carlos|OCUPADO|00:44
+1|Carlos|LIBRE
 2|Ana|LIBRE
 3|Luis|LIBRE
 4|Sofia|LIBRE

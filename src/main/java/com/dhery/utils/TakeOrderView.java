@@ -605,9 +605,10 @@ public class TakeOrderView {
 
         // Guardar también en facturas.txt (para historial del cliente)
         int idFact = nextId(FACTURAS_TXT);
+        String horaActual = java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
         arch.agregarLinea(FACTURAS_TXT,
             idFact + "|" + (currentUser != null ? currentUser.getId() : 0) + "|"
-            + java.time.LocalDate.now() + "|" + total + "|" + tipo + "|" + prods);
+            + java.time.LocalDate.now() + "|" + total + "|" + tipo + "|" + horaActual + "|" + prods);
     }
 
     private static int nextId(String ruta) {

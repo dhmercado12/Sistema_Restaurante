@@ -23,6 +23,7 @@ import com.dhery.views.EditarDatosView;
 import com.dhery.views.EstadoCocinaView;
 import com.dhery.views.ControlDeliveryView;
 import com.dhery.views.SuggestionHistoryView;
+import com.dhery.views.AdminDashboardView;
 
 
 public class Router {
@@ -38,7 +39,8 @@ public class Router {
 
     public enum Role {
         CAJERO,
-        CLIENTE
+        CLIENTE,
+        ADMINISTRADOR,
     }
 
     private static Role currentRole;
@@ -163,5 +165,9 @@ public static void goEstadoCocinaView() {
             "Tacabrón - Historial de Sugerencias"
     );
 }
+    public static void goAdminDashboardView(user user) {
+        stage.setScene(AdminDashboardView.getScene(user));
+        stage.setTitle("Tacabrón - Administrador");
+    }
 
 }

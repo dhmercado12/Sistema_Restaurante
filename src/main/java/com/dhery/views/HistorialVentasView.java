@@ -335,7 +335,26 @@ private static user currentUser;
 
         Label lblCliente = fieldLabel("Cliente:");
         ComboBox<String> cbCliente = new ComboBox<>();
-        cbCliente.getItems().addAll("Todos los clientes", "jhon alan", "omar mirko", "dhery", "marcelo", "ale");
+        cbCliente.getItems().add("Todos los clientes");
+        // Cargar clientes reales desde usuarios.txt
+        try {
+            com.dhery.GestorArchivo.ArchivoManager archUsers = new com.dhery.GestorArchivo.ArchivoManager();
+            List<String> lineasU = archUsers.leerLineas("src/main/java/com/dhery/GestorArchivo/usuarios.txt");
+            for (String lu : lineasU) {
+                if (lu == null || lu.isBlank()) continue;
+                String[] pu = lu.split("\\|", -1);
+                if (pu.length >= 4 && pu[3].trim().equalsIgnoreCase("CLIENTE")) {
+                    String nombre = pu[1].trim();
+                    if (pu.length >= 5 && !pu[4].isBlank()) nombre = nombre + " " + pu[4].trim();
+                    if (!cbCliente.getItems().contains(nombre))
+                        cbCliente.getItems().add(nombre);
+                }
+            }
+        } catch (Exception ignored) {}
+        if (cbCliente.getItems().size() == 1) {
+            // fallback si no hay usuarios CLIENTE
+            cbCliente.getItems().addAll("jhon alan", "omar mirko", "dhery", "marcelo", "ale");
+        }
         cbCliente.setValue("Todos los clientes");
         cbCliente.setMaxWidth(Double.MAX_VALUE);
         styleCombo(cbCliente);
@@ -663,28 +682,79 @@ private static user currentUser;
     // ═══════════════════════════════════════════════════════════════════════════
     // DATOS DE MUESTRA
     // ═══════════════════════════════════════════════════════════════════════════
+    // Formato facturas.txt nuevo: id|userId|fecha|total|tipo|hora|prod1 xN, prod2 xN...
+    // Formato facturas.txt viejo: id|userId|fecha|total|tipo|prod1 xN, prod2 xN...
     private static ObservableList<Venta> buildSampleVentas() {
-        return FXCollections.observableArrayList(
-            new Venta(1,  "24/05/2025","14:35","jhon alan", 45.50, 4,  "Birria x2, Jamaica x1"),
-            new Venta(2,  "24/05/2025","14:28","jhon alan",  8.00, 0,  "Jamaica x1"),
-            new Venta(3,  "24/05/2025","14:16","jhon alan", 98.75,12,  "Megaburrito x2, Ramen Birria x1"),
-            new Venta(4,  "24/05/2025","14:12","jhon alan", 41.00, 4,  "Quesabirria x1, Horchata x1"),
-            new Venta(5,  "24/05/2025","13:45","jhon alan",23000.00,3000,"Pedido especial grande"),
-            new Venta(6,  "24/05/2025","13:39","jhon alan", 40.00, 6,  "Suadero x2"),
-            new Venta(7,  "24/05/2025","13:21","jhon alan", 45.00, 4,  "Birria x2, Nachos x1"),
-            new Venta(8,  "23/05/2025","12:05","omar mirko",13.00, 0,  "Jamaica x1, Tortilla x1"),
-            new Venta(9,  "23/05/2025","11:58","dhery",     30.00, 6,  "Pastor x1, Suadero x1"),
-            new Venta(10, "23/05/2025","11:40","jhon alan", 45.00, 0,  "Megaburrito x1"),
-            new Venta(11, "23/05/2025","11:15","marcelo",   50.00, 4,  "Ramen Birria x1, Horchata x1"),
-            new Venta(12, "23/05/2025","10:50","jhon alan",138.00,21,  "Combo familiar"),
-            new Venta(13, "22/05/2025","10:45","ale",       45.00, 5,  "Birria x2"),
-            new Venta(14, "22/05/2025","10:30","ale",       15.00, 4,  "Nachos x1"),
-            new Venta(15, "22/05/2025","10:12","dhery",    110.00,21,  "Nachos Combo x2"),
-            new Venta(16, "22/05/2025","09:50","marcelo",   35.00, 5,  "Birria x1"),
-            new Venta(17, "22/05/2025","09:30","jhon alan", 90.00, 8,  "Quesabirria x2, Jamaica x1"),
-            new Venta(18, "21/05/2025","15:00","ale",       55.00,10,  "Megaburrito Combo"),
-            new Venta(19, "21/05/2025","14:30","dhery",     30.00, 5,  "Pastor x1"),
-            new Venta(20, "21/05/2025","13:00","omar mirko",45.00, 6,  "Birria x2")
-        );
+        ObservableList<Venta> lista = FXCollections.observableArrayList();
+
+        com.dhery.GestorArchivo.ArchivoManager arch = new com.dhery.GestorArchivo.ArchivoManager();
+        List<String> lineas = arch.leerLineas("src/main/java/com/dhery/GestorArchivo/facturas.txt");
+
+        // Cargar mapa userId → nombre
+        java.util.Map<String, String> usuarioNombres = new java.util.HashMap<>();
+        List<String> lineasUsuarios = arch.leerLineas("src/main/java/com/dhery/GestorArchivo/usuarios.txt");
+        for (String l : lineasUsuarios) {
+            if (l == null || l.isBlank()) continue;
+            String[] p = l.split("\\|", -1);
+            if (p.length >= 2) {
+                String id = p[0].trim();
+                String nombre = p[1].trim();
+                if (p.length >= 5 && !p[4].isBlank())
+                    nombre = nombre + " " + p[4].trim();
+                usuarioNombres.put(id, nombre);
+            }
+        }
+
+        int contador = 1;
+        for (String linea : lineas) {
+            if (linea == null || linea.isBlank()) continue;
+            String[] p = linea.split("\\|", -1);
+            if (p.length < 5) continue;
+            try {
+                // Campos fijos: id|userId|fecha|total|tipo
+                String userId = p[1].trim();
+                String fecha  = p[2].trim();  // yyyy-MM-dd
+                double total  = Double.parseDouble(p[3].trim());
+
+                // Detectar si p[5] es una hora (HH:mm) o el inicio de productos
+                String hora = "00:00";
+                int prodStart = 5;
+                if (p.length > 5) {
+                    String campo5 = p[5].trim();
+                    if (campo5.matches("\\d{2}:\\d{2}")) {
+                        hora = campo5;
+                        prodStart = 6;
+                    }
+                }
+
+                // Construir detalle de productos
+                StringBuilder detalle = new StringBuilder();
+                for (int i = prodStart; i < p.length; i++) {
+                    String seg = p[i].trim();
+                    if (seg.isEmpty()) continue;
+                    String[] prods = seg.split(",");
+                    for (String pr : prods) {
+                        pr = pr.trim();
+                        if (pr.isEmpty()) continue;
+                        if (detalle.length() > 0) detalle.append(", ");
+                        detalle.append(pr);
+                    }
+                }
+
+                // Fecha: yyyy-MM-dd → dd/MM/yyyy
+                String[] pf = fecha.split("-");
+                String fechaDisplay = pf.length == 3
+                    ? pf[2] + "/" + pf[1] + "/" + pf[0]
+                    : fecha;
+
+                String cliente = usuarioNombres.getOrDefault(userId, "Cliente #" + userId);
+
+                lista.add(new Venta(contador, fechaDisplay, hora, cliente, total, 0,
+                    detalle.length() > 0 ? detalle.toString() : "Sin detalle"));
+                contador++;
+            } catch (Exception ignored) {}
+        }
+
+        return lista;
     }
 }

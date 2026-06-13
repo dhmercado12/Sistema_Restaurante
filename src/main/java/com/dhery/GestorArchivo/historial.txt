@@ -29,3 +29,16 @@ HORCHATA x1|jhon apaza|11:37|LISTO
 Pedido #8|jhon apaza|11:38|ENTREGADO
 HORCHATA x1|juan|11:46|LISTO
 JAMAICA x1|juan|11:46|LISTO
+NACHOS SUPREMOS COMBO 2 x1|Dhery Mercado|03:58|LISTO
+JAMAICA x1|Dhery Mercado|03:58|LISTO
+Pedido #1|Dhery Mercado|03:58|ENTREGADO
+HORCHATA x1|jhon apaza|04:02|LISTO
+RAMEN BIRRIA x1|jhon apaza|04:02|LISTO
+Pedido #1|jhon apaza|04:03|ENTREGADO
+Pedido #2|jhon apaza|04:03|ENTREGADO
+NACHOS SUPREMOS COMBO 2 x1|alanes|04:04|LISTO
+BIRRIA x1|jhon apaza|04:40|LISTO
+Pedido #5|jhon apaza|04:41|ENTREGADO
+JAMAICA x5|froilan|04:43|LISTO
+JAMAICA x5|max|05:13|LISTO
+Pedido #7|max|05:15|ENTREGADO
