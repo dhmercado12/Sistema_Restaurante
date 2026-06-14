@@ -213,7 +213,13 @@ private static user currentUser;
         btnBack.setPrefWidth(120);
         btnBack.setStyle("-fx-background-color: " + ORANGE + "; -fx-text-fill: white;" +
             " -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-radius: 8; -fx-cursor: hand;");
-        btnBack.setOnAction(e -> Router.goMenuCajeroView(currentUser));
+        btnBack.setOnAction(e -> {
+            if (Router.getRole() == Router.Role.ADMINISTRADOR) {
+                Router.goAdminDashboardView(Router.getCurrentUser());
+            } else {
+                Router.goMenuCajeroView(currentUser);
+            }
+        });
         bottom.getChildren().add(btnBack);
 
         panel.getChildren().addAll(header, table, bottom);

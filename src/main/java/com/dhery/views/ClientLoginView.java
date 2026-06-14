@@ -169,7 +169,8 @@ public class ClientLoginView {
                 if (username.equals("delivery")) {
                     Router.goControlDeliveryView();
 
-                } else if (username.equals("cajera")) {
+                } else if (username.contains("cajera") || username.contains("cajero")) {
+                    // Acepta "cajera", "cajero", "cajero1", "cajero_turno2", etc.
                     Router.goMenuCajeroView(user);
 
                 } else if (username.equals("cocina")) {

@@ -133,7 +133,13 @@ private static user currentUser;
         HBox bottom = new HBox();
         bottom.setPadding(new Insets(12, 28, 16, 28));
         Button btnBack = redOutlineButton("← ATRÁS");
-        btnBack.setOnAction(e -> Router.goMenuCajeroView(currentUser));
+        btnBack.setOnAction(e -> {
+            if (Router.getRole() == Router.Role.ADMINISTRADOR) {
+                Router.goAdminDashboardView(Router.getCurrentUser());
+            } else {
+                Router.goMenuCajeroView(currentUser);
+            }
+        });
         bottom.getChildren().add(btnBack);
 
         panel.getChildren().addAll(header, table, paginacionArea, bottom);

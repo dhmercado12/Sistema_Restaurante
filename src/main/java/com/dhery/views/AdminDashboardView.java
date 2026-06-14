@@ -102,8 +102,8 @@ public class AdminDashboardView {
         content.getChildren().addAll(
             buildSidebarBtn("➕", "Crear Cajero",   () -> mostrarDialogoCrearUsuario("CAJERO")),
             buildSidebarBtn("🛵", "Crear Delivery",  () -> mostrarDialogoCrearUsuario("DELIVERY")),
-            buildSidebarBtn("✏️", "Editar Usuarios",  () -> mostrarDialogoEditarUsuario()),
-            buildSidebarBtn("🗑️", "Eliminar Usuarios",() -> mostrarDialogoEliminarUsuario())
+            buildSidebarBtn("📝", "Editar Usuarios",  () -> mostrarDialogoEditarUsuario()),
+            buildSidebarBtn("❌", "Eliminar Usuarios",() -> mostrarDialogoEliminarUsuario())
         );
         content.getChildren().add(buildDivider());
 
@@ -111,7 +111,7 @@ public class AdminDashboardView {
         content.getChildren().add(buildSidebarSection("📦", "INVENTARIO"));
         content.getChildren().addAll(
             buildSidebarBtn("📋", "Gestionar Stock",    () -> Router.goStockView()),
-            buildSidebarBtn("⚠️", "Alertas de Escasez", () -> mostrarAlertasEscasez())
+            buildSidebarBtn("🔔", "Alertas de Escasez", () -> mostrarAlertasEscasez())
         );
 
         // Panel de escasez
@@ -126,10 +126,6 @@ public class AdminDashboardView {
             buildMonitorStatRow("🍳", "En preparación", contarEnPreparacion(), "#FF8C00"),
             buildMonitorStatRow("✅", "Entregados",   contarEntregados(), "#2E7D32")
         );
-
-        HBox verPedidosBtn = buildRedFullButton("👁  Ver todos los pedidos",
-            () -> Router.goEstadoCocinaView());
-        content.getChildren().add(verPedidosBtn);
 
         scroll.setContent(content);
         sidebar.getChildren().add(scroll);
@@ -745,9 +741,23 @@ public class AdminDashboardView {
 
         String estadoColor, estadoDisplay;
         switch (estadoTxt.toUpperCase()) {
-            case "LISTO":     estadoColor = "#FF8C00"; estadoDisplay = "Pendiente";     break;
-            case "ENTREGADO": estadoColor = "#2E7D32"; estadoDisplay = "Entregado";     break;
-            default:          estadoColor = "#1565C0"; estadoDisplay = "En preparación"; break;
+            case "LISTO":
+                // Mesa: listo en cocina = se sirve directo → Entregado
+                // Delivery: listo = pendiente de reparto → Pendiente
+                if (!esDelivery) {
+                    estadoColor = "#2E7D32"; estadoDisplay = "Entregado";
+                } else {
+                    estadoColor = "#FF8C00"; estadoDisplay = "Pendiente";
+                }
+                break;
+            case "LISTO_PARA_ENVIO":
+                estadoColor = "#FF8C00"; estadoDisplay = "Pendiente";     break;
+            case "ENTREGADO":
+                estadoColor = "#2E7D32"; estadoDisplay = "Entregado";     break;
+            case "EN_PROCESO":
+                estadoColor = "#1565C0"; estadoDisplay = "En preparación"; break;
+            default:
+                estadoColor = "#1565C0"; estadoDisplay = "En preparación"; break;
         }
         Label estadoBadge = buildBadge(estadoDisplay, estadoColor, "white");
 
@@ -796,11 +806,21 @@ public class AdminDashboardView {
         // Badge tipo
         Label tipoBadge = buildBadge(p.esDelivery ? "Delivery" : "Mesa", ROJO, "white");
 
-        // Badge estado
-        String estadoColor = p.estado.contains("PROCESO") ? "#FF8C00" :
-                             p.estado.contains("LISTO")   ? "#2E7D32" : "#1565C0";
-        String estadoText  = p.estado.contains("PROCESO") ? "En preparación" :
-                             p.estado.contains("LISTO")   ? "Entregado" : "Pendiente";
+        // Badge estado — para Mesa: LISTO = Entregado; para Delivery: LISTO = Pendiente (pendiente de reparto)
+        String estadoColor, estadoText;
+        if (p.estado.contains("PROCESO")) {
+            estadoColor = "#1565C0"; estadoText = "En preparación";
+        } else if (p.estado.contains("ENTREGADO")) {
+            estadoColor = "#2E7D32"; estadoText = "Entregado";
+        } else if (p.estado.contains("LISTO")) {
+            if (!p.esDelivery) {
+                estadoColor = "#2E7D32"; estadoText = "Entregado";
+            } else {
+                estadoColor = "#FF8C00"; estadoText = "Pendiente";
+            }
+        } else {
+            estadoColor = "#1565C0"; estadoText = "Pendiente";
+        }
         Label estadoBadge  = buildBadge(estadoText, estadoColor, "white");
 
         Label fechaLbl  = cellLbl(LocalDate.now().format(
@@ -991,21 +1011,16 @@ public class AdminDashboardView {
         int row = 0;
         grid.add(new Label("Usuario:"),   0, row); grid.add(tfUsername,  1, row++);
 
-        // Contraseña y Dirección solo para CAJERO, no para DELIVERY
+        // Contraseña solo para CAJERO, no para DELIVERY. Dirección eliminada para CAJERO.
         PasswordField tfPass  = new PasswordField();
         TextField tfDireccion = new TextField();
         if (!esDelivery) {
-            tfPass.setPromptText("Contraseña");
-            tfDireccion.setPromptText("Dirección");
-            grid.add(new Label("Contraseña:"), 0, row); grid.add(tfPass,      1, row++);
+            tfPass.setPromptText("Contraseña (dejar vacío = 1234)");
+            grid.add(new Label("Contraseña:"), 0, row); grid.add(tfPass, 1, row++);
         }
 
         grid.add(new Label("Apellidos:"), 0, row); grid.add(tfApellidos, 1, row++);
         grid.add(new Label("Teléfono:"),  0, row); grid.add(tfTelefono,  1, row++);
-
-        if (!esDelivery) {
-            grid.add(new Label("Dirección:"), 0, row); grid.add(tfDireccion, 1, row++);
-        }
 
         Label hint;
         if (esDelivery) {
@@ -1034,14 +1049,10 @@ public class AdminDashboardView {
                     return;
                 }
 
-                String pass     = esDelivery ? "delivery1234" : tfPass.getText();
-                String direccion = esDelivery ? "" : tfDireccion.getText().trim();
-
-                if (!esDelivery && pass.isEmpty()) {
-                    new Alert(Alert.AlertType.WARNING,
-                        "Usuario y contraseña son obligatorios.").showAndWait();
-                    return;
-                }
+                String passInput = tfPass.getText();
+                String pass      = esDelivery ? "delivery1234"
+                                 : (passInput.isEmpty() ? "1234" : passInput);
+                String direccion = "";   // Dirección eliminada para CAJERO
 
                 UserRepository repo = new UserRepository();
                 int nuevoId = repo.generarNuevoId();

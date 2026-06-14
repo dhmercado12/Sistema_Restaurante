@@ -336,7 +336,11 @@ VBox.setVgrow(activosSection, Priority.NEVER); // activos toma solo lo que neces
         Button btnBack = outlineRedButton("← VOLVER");
         btnBack.setOnAction(e -> {
             if (autoRefresh != null) autoRefresh.stop();
-            Router.goMenuCajeroView(Router.getCurrentUser());
+            if (Router.getRole() == Router.Role.ADMINISTRADOR) {
+                Router.goAdminDashboardView(Router.getCurrentUser());
+            } else {
+                Router.goMenuCajeroView(Router.getCurrentUser());
+            }
         });
 
         Region spacer = new Region();
@@ -701,8 +705,10 @@ VBox.setVgrow(activosSection, Priority.NEVER); // activos toma solo lo que neces
     }
 
     /**
-     * FIX: escribe LISTO en pedidos.txt para pedidos LOCAL cuando el timer llega a 0.
-     * Sin esto cargarPedidos() leía EN_PROCESO y recreaba la fila indefinidamente.
+     * Cuando el timer llega a 0:
+     * - Pedidos DELIVERY → estado "LISTO_PARA_ENVIO" (pendiente de reparto)
+     * - Pedidos de MESA (LOCAL) → estado "ENTREGADO" directamente,
+     *   porque una vez listo en cocina se sirve inmediatamente en la mesa.
      */
     private static void marcarPedidoListoEnArchivo(String idPedido) {
         ArchivoManager arch  = new ArchivoManager();
@@ -712,13 +718,19 @@ VBox.setVgrow(activosSection, Priority.NEVER); // activos toma solo lo que neces
             String[] p = linea.split("\\|");
             if (p.length >= 8 && p[0].trim().equals(idPedido.trim())) {
                 String tipo = p.length > 4 ? p[4].trim() : "";
-                if (!tipo.equals("DELIVERY") && p[7].trim().equals("EN_PROCESO")) {
-                    p[7] = "LISTO";
+                if (p[7].trim().equals("EN_PROCESO")) {
                     String hora = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+                    if (tipo.equalsIgnoreCase("DELIVERY")) {
+                        // Delivery: marcar listo para envío, aún no entregado
+                        p[7] = "LISTO_PARA_ENVIO";
+                    } else {
+                        // Mesa/LOCAL: se sirve directo → ENTREGADO automáticamente
+                        p[7] = "ENTREGADO";
+                    }
                     for (int i = 8; i < p.length; i++) {
                         if (!p[i].trim().isEmpty() && !p[i].trim().startsWith("REP:")) {
                             arch.agregarLinea(HISTORIAL_TXT,
-                                p[i].trim() + "|" + p[1].trim() + "|" + hora + "|LISTO");
+                                p[i].trim() + "|" + p[1].trim() + "|" + hora + "|" + p[7]);
                         }
                     }
                 }
