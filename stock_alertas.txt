@@ -6,3 +6,4 @@
 08/06/2026 21:22 | STOCK BAJO | Jamaica | 260.0 ml
 13/06/2026 04:42 | STOCK BAJO | Jamaica | 0.0 ml
 13/06/2026 05:13 | STOCK BAJO | Jamaica | 0.0 ml
+14/06/2026 19:44 | STOCK BAJO | Jamaica | 260.0 ml

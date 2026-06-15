@@ -24,6 +24,7 @@ import com.dhery.views.EstadoCocinaView;
 import com.dhery.views.ControlDeliveryView;
 import com.dhery.views.SuggestionHistoryView;
 import com.dhery.views.AdminDashboardView;
+import com.dhery.views.SeguimientoDeliveryView;
 
 
 public class Router {
@@ -169,5 +170,9 @@ public static void goEstadoCocinaView() {
         stage.setScene(AdminDashboardView.getScene(user));
         stage.setTitle("Tacabrón - Administrador");
     }
+    public static void goSeguimientoDeliveryView() {
+    stage.setScene(SeguimientoDeliveryView.getScene(currentUser));
+    stage.setTitle("Tacabrón - Seguimiento Delivery");
+}
 
 }

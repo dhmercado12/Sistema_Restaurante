@@ -563,8 +563,40 @@ public class TakeOrderView {
             orderItems.clear(); refreshTotals(); facturaStage.close();
         });
 
-        root.getChildren().addAll(title, subtitle, new Separator(), lCliente, lDir, lCel, lEntrega,
-            new Separator(), itemsBox, new Separator(), totalLblFinal, nota, btnOk);
+        Button btnCancelar = new Button("CANCELAR");
+
+btnCancelar.setStyle(
+    "-fx-background-color:" + RED + ";" +
+    "-fx-text-fill:white;" +
+    "-fx-font-weight:bold;" +
+    "-fx-font-size:13px;" +
+    "-fx-background-radius:8;" +
+    "-fx-cursor:hand;"
+);
+
+btnCancelar.setOnAction(e -> {
+    facturaStage.close();
+});
+
+HBox botones = new HBox(10);
+botones.setAlignment(Pos.CENTER);
+botones.getChildren().addAll(btnOk, btnCancelar);
+
+root.getChildren().addAll(
+    title,
+    subtitle,
+    new Separator(),
+    lCliente,
+    lDir,
+    lCel,
+    lEntrega,
+    new Separator(),
+    itemsBox,
+    new Separator(),
+    totalLblFinal,
+    nota,
+    botones
+);
         facturaStage.setScene(new Scene(root, 360, 540));
         facturaStage.setTitle("Factura Tacabrón"); facturaStage.show();
     }

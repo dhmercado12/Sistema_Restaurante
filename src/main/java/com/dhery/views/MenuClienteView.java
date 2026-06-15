@@ -142,21 +142,22 @@ public class MenuClienteView {
 
         String[][] items = {
 
-            {"🛒", "REALIZAR PEDIDO",
-                "Crear un nuevo pedido\ndesde el menú"},
+    {"🛒", "REALIZAR PEDIDO",
+        "Crear un nuevo pedido\ndesde el menú"},
 
-            {"📋", "VER MIS PEDIDOS",
-                "Consultar el estado\nde mis pedidos"},
+    {"📋", "VER MIS PEDIDOS",
+        "Consultar el estado\nde mis pedidos"},
 
-            {"🍽️", "VER MENÚ",
-                "Consultar productos\ny precios disponibles"},
 
-            {"👤", "MIS DATOS",
-                "Ver y actualizar\ninformación personal"},
+    {"🍽️", "VER MENÚ",
+        "Consultar productos\ny precios disponibles"},
 
-            {"💬", "REALIZAR SUGERENCIA",
-                "Enviar comentarios\ny sugerencias"}
-        };
+    {"👤", "MIS DATOS",
+        "Ver y actualizar\ninformación personal"},
+
+    {"💬", "REALIZAR SUGERENCIA",
+        "Enviar comentarios\ny sugerencias"}
+};
 
         for (int i = 0; i < items.length; i++) {
 
@@ -221,12 +222,16 @@ public class MenuClienteView {
         } else if (title.equals("VER MIS PEDIDOS")) {
             card.setOnMouseClicked(e -> Router.goMisFacturas());
 
+          
+          
+
         } else if (title.equals("MIS DATOS")) {
            card.setOnMouseClicked(e -> Router.goMisDatos(currentUser));
 
         } else if (title.equals("REALIZAR SUGERENCIA")) {
            card.setOnMouseClicked(e -> Router.goSuggestionView());
         }
+        
 
         // ── ICONO ────────────────────────────────────────────
 
